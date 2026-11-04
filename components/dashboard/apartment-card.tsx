@@ -59,7 +59,7 @@ export function ApartmentCard({ summary }: { summary: ApartmentSummary }) {
           <Info
             label="Valor pendiente"
             value={formatCOP(summary.valorPendiente)}
-            className="text-amber-600"
+            className="text-amber-600 dark:text-amber-400"
           />
           <Info label="Cuotas pagadas" value={String(summary.cuotasPagadas)} />
           <Info

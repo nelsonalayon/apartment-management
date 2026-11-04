@@ -10,7 +10,9 @@ const copFormatter = new Intl.NumberFormat("es-CO", {
 });
 
 export function formatCOP(value: number): string {
-  return copFormatter.format(value);
+  // Intl en es-CO agrega un espacio no separable después del "$" (ej: "$ 75.000.000").
+  // Lo quitamos para mostrar el formato del MVP: "$75.000.000".
+  return copFormatter.format(value).replace(/^\$\s/u, "$");
 }
 
 /** Formato de porcentaje con máximo 2 decimales. Ej: 39.8437 → "39,84%" */

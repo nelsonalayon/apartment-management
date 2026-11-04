@@ -10,7 +10,7 @@ export function StatusBadge({ estado }: { estado: InstallmentState }) {
   return (
     <Badge
       variant="outline"
-      className="border-amber-300 bg-amber-50 font-medium text-amber-700"
+      className="border-amber-300 bg-amber-50 font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300"
     >
       Pendiente
     </Badge>

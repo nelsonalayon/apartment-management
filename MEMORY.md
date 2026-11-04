@@ -1,0 +1,23 @@
+# Memoria del proyecto
+
+## Estado actual
+- MVP funcional: dashboard de cuota inicial (2 apartamentos, 4 usuarios, 20 cuotas) con datos mock. Último commit: `5da6158`.
+- Tests Vitest: 22/22 (`pnpm test`) — cálculos, formato, integridad de datos.
+- Modo oscuro AÑADIDO: 3 estados (Sistema/Claro/Oscuro) con `next-themes`, default **oscuro**, botón en Header.
+- `formatCOP` corrige el NBSP de Intl → "$75.000.000" exacto.
+- Pendiente de commit: dark mode + tests + docs (el usuario decidió cuándo).
+
+## Decisiones importantes (y por qué)
+- Todo cálculo deriva de `data/mock-data.ts`; nunca guardar valores calculados.
+- Server Component + un solo `"use client"` (`installments-section`, `theme-toggle` por estado).
+- Sin librerías de gráficas: barras con `div` + Tailwind.
+- `next-themes` (excepción justificada a "sin dependencias"): anti-FOUC + estándar shadcn. Config: `attribute="class" defaultTheme="dark" enableSystem`.
+- Botón de tema usa `useSyncExternalStore` (no `useState`+effect) → pasa la regla `react-hooks/set-state-in-effect`.
+- Colores amber con variantes `dark:` explícitas (badge pendiente y valor pendiente).
+
+## Errores a evitar
+- `useEffect(() => setMounted(true))` → ERROR de lint (`react-hooks/set-state-in-effect`). Usar `useSyncExternalStore`.
+- Asumir formato de Intl sin probarlo: es-CO da "$ 75.000.000" (NBSP) y fecha "15 de ene de 2026".
+- Chequeos HTML con entidades UTF-8 → falsos negativos; leer `RawContentStream` como UTF8.
+- Matar el servidor del puerto 3000 antes de `pnpm build` (si no, sirve build viejo o choca).
+- El bloque `nextjs-agent-rules` de AGENTS.md lo re-escribe `next dev`: no quitarlo del diff.

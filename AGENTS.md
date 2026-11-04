@@ -7,8 +7,6 @@
 - `pnpm start` — sirve el build de producción
 - `pnpm lint` — ESLint (verificar después de escribir código)
 
-**Verificación obligatoria:** después de cada cambio, ejecutar `pnpm build` y `pnpm lint`. Corregir cualquier error antes de terminar.
-
 ## Estructura
 
 Proyecto: MVP para controlar el pago de la cuota inicial de dos apartamentos (101 y 202) con 4 usuarios. Solo datos mock, sin backend, autenticación ni base de datos.
@@ -21,6 +19,7 @@ data/mock-data.ts       → ÚNICA fuente de datos (apartamentos, usuarios, cuot
 lib/types.ts            → tipos compartidos (Apartment, User, Installment)
 lib/calculations.ts     → funciones puras de cálculo
 lib/format.ts           → formatCOP, formatPercent, formatDate
+components/dashboard/theme-toggle.tsx → botón Sistema/Claro/Oscuro (next-themes)
 ```
 
 ## Reglas de código
@@ -33,6 +32,7 @@ lib/format.ts           → formatCOP, formatPercent, formatDate
 6. **Sin dependencias nuevas** sin justificarlo explícitamente. No hay librerías de gráficas: las barras de progreso son `div` + Tailwind.
 7. **Alcance del MVP:** no agregar login, backend, formularios de pagos, notificaciones, exportaciones ni funcionalidades no solicitadas.
 8. **Estilo:** usar shadcn/ui y las clases existentes del tema (zinc + emerald). Diseño responsive (grids `sm:`/`md:`/`lg:`).
+9. **Tema oscuro:** el selector está en el Header (`theme-toggle.tsx`) con 3 estados (Sistema/Claro/Oscuro) vía `next-themes` — default "oscuro". Usar siempre los tokens del tema (`bg-background`, `text-foreground`, `bg-card`, `text-muted-foreground`...); **prohibido** colores fijos (`bg-white`, `text-amber-600`...) sin su variante `dark:`. `next-themes` es la excepción justificada a la regla 6 (anti-parpadeo + estándar shadcn).
 
 ## Forma de trabajar
 
@@ -46,6 +46,23 @@ lib/format.ts           → formatCOP, formatPercent, formatDate
 - Mantenlo breve (Máximo ~50 líneas). Resume o elimina lo que ya no aporte.
 - Si algo se convierte en una regla permanente, propón moverlo a 'AGENTS.md' en lugar de dejarlo en la memoria. 
 - No guardes nunca datos sensibles (Claves, tokens, datos personales...)
+
+## Limites
+
+- Siempre: Actualizar `MEMORY.md` al terminar cada tarea.
+
+## Verificación
+
+Orden obligatorio al terminar cada tarea:
+
+1. `pnpm test` — tests unitarios (Vitest) de cálculos, formato e integridad de los datos mock.
+2. `pnpm build` — debe compilar sin errores de TypeScript.
+3. `pnpm lint` — sin errores de ESLint.
+
+Si algo falla, corrige antes de terminar. Los tests viven junto a lo que prueban (`lib/*.test.ts`, `data/*.test.ts`); si cambias una regla de cálculo o formato, actualiza o añade el test que la cubra.
+
+
+
 
 <!-- BEGIN:nextjs-agent-rules -->
 
