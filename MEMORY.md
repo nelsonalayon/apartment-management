@@ -2,6 +2,7 @@
 
 ## Estado actual
 - MVP dashboard cuota inicial conectado a **MySQL real** (`sistema_propiedad`, Workbench) vía `mysql2` — sin API REST ni fallback a mock. Últimos commits: `feat` conexión MySQL y `docs` plantilla LEARNINGS enseñable.
+- Datos al día hasta oct-2026 (10 nov 2026): 5 cuotas marcadas pagadas + 4 pagos insertados siguiendo la convención existente (fecha_pago = vencimiento, idperson = quien_debe_pagar, valor = valor_cuota); el pago 36 quedó consistente con su cuota 77. Backup previo en `backups/` (gitignored).
 - Tests Vitest: **29/29** (`pnpm test`) — cálculos (incl. extras), formato, integridad de fixtures.
 - `LEARNINGS.md`: plantilla "enseñable" en español (título-pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales verificados).
 - Modo oscuro: 3 estados con `next-themes`, default **oscuro**, botón en Header. `formatCOP` corrige el NBSP de Intl → "$75.000.000".
@@ -18,7 +19,6 @@
 - **PowerShell `node -e` rompe las comillas del SQL** → escribir `scripts/*.mjs` y correr `node scripts/x.mjs` (hay `scripts/db-diagnostic.mjs`).
 - En `cuotas` la columna es **`valor_cuota`** (no `valor`).
 - **`pool.query<T>` de mysql2 exige `T extends QueryResult`** → los tipos de fila deben `extends RowDataPacket` (si no, falla el build con TS2344).
-- ⚠️ **Dato inconsistente en la BD:** pago `idpago=36` ($3.933.000) apunta a cuota `idcuota=77` que está `pendiente` — corregir en Workbench (marcar cuota pagada o quitar pago).
 - `.env.local` (credenciales) NUNCA a git ni a AGENTS.md/MEMORY.md/LEARNINGS.md.
 - Hidratación: `<html>` necesita `suppressHydrationWarning`; en el toggle, todo lo que depende del tema espera a `montado` (`useSyncExternalStore`, no `useState`+effect → `react-hooks/set-state-in-effect`).
 - Asumir formato de Intl sin probar: es-CO da NBSP en "$" y fecha "15 de ene de 2026".
