@@ -1,33 +1,73 @@
+import { Suspense } from "react";
 import { ApartmentCard } from "@/components/dashboard/apartment-card";
 import { Header } from "@/components/dashboard/header";
 import { InstallmentsSection } from "@/components/dashboard/installments-section";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { UsersSummary } from "@/components/dashboard/users-summary";
 import {
+  getApartments,
+  getExtraPayments,
+  getInstallments,
+  getUsers,
+} from "@/data/db";
+import {
   getApartmentSummary,
   getGeneralSummary,
   getUserSummary,
 } from "@/lib/calculations";
-import { apartments, installments, users } from "@/data/mock-data";
 
 /**
  * Dashboard principal (Server Component).
- * Los cálculos se hacen aquí a partir de los datos mock
- * y el resultado se pasa a los componentes como props.
+ * Los datos reales se leen de MySQL en cada request: el shell (Header)
+ * se sirve al instante y el contenido entra por streaming detrás de
+ * <Suspense> (patrón de Cache Components para datos frescos).
  */
 export default function Home() {
-  const general = getGeneralSummary(apartments, installments);
-  const apartmentSummaries = apartments.map((apartment) =>
-    getApartmentSummary(apartment, installments)
-  );
-  const userSummaries = users.map((user) =>
-    getUserSummary(user, installments)
-  );
-
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6">
       <Header />
 
+      <Suspense fallback={<DashboardLoading />}>
+        <DashboardContent />
+      </Suspense>
+    </main>
+  );
+}
+
+/** Mientras la BD responde, el shell ya está en pantalla. */
+function DashboardLoading() {
+  return (
+    <section
+      className="flex flex-col gap-4"
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <p className="animate-pulse text-muted-foreground">
+        Cargando datos de la base de datos...
+      </p>
+    </section>
+  );
+}
+
+/** Consulta la BD y arma los resúmenes con cálculos puros. */
+async function DashboardContent() {
+  const [apartments, users, installments, extras] = await Promise.all([
+    getApartments(),
+    getUsers(),
+    getInstallments(),
+    getExtraPayments(),
+  ]);
+
+  const general = getGeneralSummary(apartments, installments, extras);
+  const apartmentSummaries = apartments.map((apartment) =>
+    getApartmentSummary(apartment, installments, extras)
+  );
+  const userSummaries = users.map((user) =>
+    getUserSummary(user, installments, extras)
+  );
+
+  return (
+    <>
       {/* ---------- Resumen general ---------- */}
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold tracking-tight">
@@ -58,6 +98,6 @@ export default function Home() {
         apartments={apartments}
         users={users}
       />
-    </main>
+    </>
   );
 }

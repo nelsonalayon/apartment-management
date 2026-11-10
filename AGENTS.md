@@ -9,24 +9,26 @@
 
 ## Estructura
 
-Proyecto: MVP para controlar el pago de la cuota inicial de dos apartamentos (101 y 202) con 4 usuarios. Solo datos mock, sin backend, autenticación ni base de datos.
+Proyecto: MVP para controlar el pago de la cuota inicial de dos apartamentos (101 y 202) con 4 usuarios. Datos reales desde MySQL local (Workbench), sin backend, autenticación ni API REST.
 
 ```
 app/                    → App Router; page.tsx es el dashboard (Server Component)
 components/dashboard/   → componentes propios del dashboard
 components/ui/          → componentes shadcn/ui (no editar salvo necesidad)
-data/mock-data.ts       → ÚNICA fuente de datos (apartamentos, usuarios, cuotas)
-lib/types.ts            → tipos compartidos (Apartment, User, Installment)
+data/db.ts              → capa de datos MySQL (pool + consultas; ÚNICA fuente en runtime)
+data/mock-data.ts       → datos mock (solo fixture de los tests)
+lib/types.ts            → tipos compartidos (Apartment, User, Installment, ExtraPayment)
 lib/calculations.ts     → funciones puras de cálculo
 lib/format.ts           → formatCOP, formatPercent, formatDate
 components/dashboard/theme-toggle.tsx → botón Sistema/Claro/Oscuro (next-themes)
-LEARNINGS.md            → brief answers to code questions
+LEARNINGS.md            → aprendizajes de preguntas de código (plantilla en español)
+scripts/db-diagnostic.mjs → muestra el esquema real de la BD (node scripts/db-diagnostic.mjs)
 ```
 
 ## Reglas de código
 
-1. **Datos separados de la UI:** todos los datos viven en `data/mock-data.ts`. Para conectar una API en el futuro, se reemplaza ese archivo sin tocar los componentes (respetando los tipos de `lib/types.ts`).
-2. **Todo cálculo se deriva de las cuotas:** pagado = suma de cuotas pagadas (las pendientes nunca entran); pendiente = cuota inicial − pagado; avance = pagado / inicial × 100 con tope de 100%. Nunca guardar valores calculados en datos mock.
+1. **Datos separados de la UI:** los datos reales viven en `data/db.ts` (consultas MySQL que devuelven los tipos de `lib/types.ts`); los componentes no cambian. Si se cambia de BD/API, se reemplaza solo `data/db.ts`. Credenciales solo en `.env.local` (nunca en git ni en documentación).
+2. **Todo cálculo se deriva de las cuotas y los extras:** pagado = suma de cuotas pagadas + pagos_adicionales (`pagos_adicionales` SÍ cuentan; las pendientes nunca entran); pendiente = cuota inicial − pagado (mín. 0); avance = pagado / inicial × 100 con tope de 100%. Nunca guardar valores calculados.
 3. **Formato:** dinero siempre con `formatCOP` (ej: `$75.000.000`), porcentajes con `formatPercent` (máx. 2 decimales), fechas con `formatDate`.
 4. **Server/Client Components:** las páginas son Server Components por defecto (calculan en el servidor y pasan props). Agregar `"use client"` solo cuando haya estado, efectos o manejadores de eventos (como los filtros de `installments-section.tsx`).
 5. **Componentes pequeños:** uno por archivo en `components/dashboard/`, reutilizando `ProgressBar`, `StatusBadge` y los componentes shadcn.

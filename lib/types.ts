@@ -41,3 +41,18 @@ export type Installment = {
   /** Fecha en que se realizó el pago (ISO "YYYY-MM-DD"). Solo cuando está pagada. */
   fechaPago?: string;
 };
+
+/** Pago adicional que no es una cuota (separación, reformas, etc.). */
+export type ExtraPayment = {
+  id: string;
+  /** Apartamento al que aporta. */
+  apartmentId: string;
+  /** Monto en pesos. */
+  monto: number;
+  /** Concepto del pago, ej. "separacion torre 1". */
+  concepto?: string;
+  /** Fecha en que se pagó (ISO "YYYY-MM-DD"). */
+  fecha: string;
+  /** Usuario que realizó el pago. */
+  userId?: string;
+};
