@@ -1,11 +1,10 @@
 # Memoria del proyecto
 
 ## Estado actual
-- MVP funcional: dashboard de cuota inicial (2 apartamentos, 4 usuarios, 20 cuotas) con datos mock. Último commit: `5da6158`.
+- MVP funcional: dashboard de cuota inicial (2 apartamentos, 4 usuarios, 20 cuotas) con datos mock. Último commit: dark mode + tests + docs.
 - Tests Vitest: 22/22 (`pnpm test`) — cálculos, formato, integridad de datos.
 - Modo oscuro AÑADIDO: 3 estados (Sistema/Claro/Oscuro) con `next-themes`, default **oscuro**, botón en Header.
 - `formatCOP` corrige el NBSP de Intl → "$75.000.000" exacto.
-- Pendiente de commit: dark mode + tests + docs (el usuario decidió cuándo).
 
 ## Decisiones importantes (y por qué)
 - Todo cálculo deriva de `data/mock-data.ts`; nunca guardar valores calculados.
@@ -16,6 +15,7 @@
 - Colores amber con variantes `dark:` explícitas (badge pendiente y valor pendiente).
 
 ## Errores a evitar
+- Hidratación (2 errores vistos en consola): (1) `<html>` necesita `suppressHydrationWarning` cuando next-themes pone `class="dark"` antes de hidratar; (2) en el toggle, TODO lo que depende del tema (icono, aria-label, title) debe esperar a `montado`, no solo el icono.
 - `useEffect(() => setMounted(true))` → ERROR de lint (`react-hooks/set-state-in-effect`). Usar `useSyncExternalStore`.
 - Asumir formato de Intl sin probarlo: es-CO da "$ 75.000.000" (NBSP) y fecha "15 de ene de 2026".
 - Chequeos HTML con entidades UTF-8 → falsos negativos; leer `RawContentStream` como UTF8.

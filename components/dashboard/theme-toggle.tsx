@@ -33,11 +33,15 @@ export function ThemeToggle() {
   // hidratación) sin usar setState dentro de efectos.
   const montado = useSyncExternalStore(suscribir, esCliente, esServidor);
 
-  const actual = opciones.find((opcion) => opcion.valor === theme) ?? opciones[0];
+  // Durante la hidratación debe renderizarse EXACTAMENTE igual que el servidor
+  // (theme = undefined): por eso TODO lo que depende del tema espera a montar,
+  // no solo el icono. Si no, React detecta diferencias en aria-label/title.
+  const actual = montado
+    ? (opciones.find((opcion) => opcion.valor === theme) ?? opciones[0])
+    : opciones[0];
   const siguiente = opciones[(opciones.indexOf(actual) + 1) % opciones.length];
 
-  // Antes de montar se muestra un icono neutro para que no parpadee el incorrecto.
-  const Icono = montado ? actual.Icono : Monitor;
+  const Icono = actual.Icono;
 
   return (
     <Button
