@@ -1,23 +1,41 @@
 # Learnings
 
-Brief answers to code questions, added automatically after each question.
-Rule: only project stack (React, Next.js, CSS/Tailwind, TypeScript, tests),
-git and tooling (pnpm, Vitest...). Nothing about OpenCode, logistics or
-non-code conversation.
+Aprendizajes de preguntas de código/conceptos, añadidos automáticamente tras
+cada pregunta. Regla: solo el stack del proyecto (React, Next.js, CSS/Tailwind,
+TypeScript, tests), git y herramientas (pnpm, Vitest...). Nada de OpenCode,
+logística ni conversación ajena al código.
 
-## Dark mode in the browser
+**Plantilla de cada entrada** (máx. ~15 líneas):
 
-- The browser only *signals* its preference (`prefers-color-scheme`); the site
-  must be built to react (CSS media query or `.dark` class). A site that only
-  has light styles stays light no matter what the browser setting is.
-- A site's own button (class on `<html>` + `localStorage`) gives per-site
-  control and usually overrides the system preference.
-- Standard pattern: 3 states (System/Light/Dark) + anti-FOUC script that
-  applies the theme before first paint (next-themes does this).
+- Título: la pregunta tal cual se hizo.
+- **Por qué pasa / por qué importa:** respuesta corta de 2-3 líneas.
+- **En el proyecto:** rutas reales relacionadas (opcional).
+- **Prueba:** comando o snippet de 1-2 líneas para experimentar (opcional).
+- **Ver más:** 2-3 enlaces oficiales verificados (siempre que aplique).
 
-## TUI (Text-based User Interface)
+## ¿Por qué mi sitio se queda en claro aunque el navegador está en oscuro?
 
-- An interactive UI drawn inside the terminal: panels, keybindings, no mouse
-  or graphical windows (vim, htop, lazygit...).
-- Unlike a CLI (type one command at a time) or a GUI (graphical window), a
-  TUI is screen-based and keyboard-driven.
+**Por qué pasa:** el navegador solo *señala* su preferencia
+(`prefers-color-scheme`); el sitio debe estar construido para reaccionar
+(media query CSS o clase `.dark`). Un sitio solo-claro se queda claro siempre.
+El botón propio (clase en `<html>` + localStorage) da control por sitio y
+sobreescribe la preferencia del sistema.
+
+- **En el proyecto:** `components/dashboard/theme-toggle.tsx` (los 3 estados:
+  Sistema/Claro/Oscuro) y `app/layout.tsx` (ThemeProvider + script anti-FOUC).
+- **Prueba:** en la consola del navegador →
+  `matchMedia('(prefers-color-scheme: dark)').matches` devuelve `true`/`false`.
+- **Ver más:** [MDN: prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme)
+  · [next-themes (GitHub)](https://github.com/pacocoursey/next-themes)
+
+## ¿Qué es una TUI?
+
+**Por qué importa:** *Text-based User Interface* — una interfaz interactiva
+dibujada en la terminal (paneles, menús y atajos de teclado, sin ratón ni
+ventanas gráficas). A diferencia de la CLI (escribes un comando y termina),
+la TUI es una pantalla viva que se navega con el teclado.
+
+- **Prueba:** corre `pnpm exec vitest` en este proyecto → el watch mode de
+  Vitest es una TUI real (flechas para navegar, `q` para salir).
+- **Ver más:** [Wikipedia: Text-based user interface](https://en.wikipedia.org/wiki/Text-based_user_interface)
+  · [Vitest: Watch Mode](https://vitest.dev/guide/features#watch-mode)

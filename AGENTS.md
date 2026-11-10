@@ -47,7 +47,7 @@ LEARNINGS.md            → brief answers to code questions
 - Al terminar una tarea, actualizalo: estado actual, decisiones importantes (con su por qué) y errores a evitar.
 - Mantenlo breve (Máximo ~50 líneas). Resume o elimina lo que ya no aporte.
 - Si algo se convierte en una regla permanente, propón moverlo a 'AGENTS.md' en lugar de dejarlo en la memoria. 
-- Tras una pregunta de código/conceptos (stack, git, herramientas), añade una entrada breve en `LEARNINGS.md` automáticamente. No guardes preguntas ajenas al código (OpenCode, logística, conversación).
+- Tras una pregunta de código/conceptos (stack, git, herramientas), añade una entrada breve en `LEARNINGS.md` automáticamente **siguiendo su plantilla** (título-pregunta, respuesta corta, "En el proyecto", "Prueba" y "Ver más" con enlaces oficiales verificados; contenido en español). No guardes preguntas ajenas al código (OpenCode, logística, conversación).
 - No guardes nunca datos sensibles (Claves, tokens, datos personales...)
 
 ## Limites
