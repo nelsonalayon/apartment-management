@@ -20,6 +20,7 @@ lib/types.ts            → tipos compartidos (Apartment, User, Installment)
 lib/calculations.ts     → funciones puras de cálculo
 lib/format.ts           → formatCOP, formatPercent, formatDate
 components/dashboard/theme-toggle.tsx → botón Sistema/Claro/Oscuro (next-themes)
+LEARNINGS.md            → brief answers to code questions
 ```
 
 ## Reglas de código
@@ -33,6 +34,7 @@ components/dashboard/theme-toggle.tsx → botón Sistema/Claro/Oscuro (next-them
 7. **Alcance del MVP:** no agregar login, backend, formularios de pagos, notificaciones, exportaciones ni funcionalidades no solicitadas.
 8. **Estilo:** usar shadcn/ui y las clases existentes del tema (zinc + emerald). Diseño responsive (grids `sm:`/`md:`/`lg:`).
 9. **Tema oscuro:** el selector está en el Header (`theme-toggle.tsx`) con 3 estados (Sistema/Claro/Oscuro) vía `next-themes` — default "oscuro". Usar siempre los tokens del tema (`bg-background`, `text-foreground`, `bg-card`, `text-muted-foreground`...); **prohibido** colores fijos (`bg-white`, `text-amber-600`...) sin su variante `dark:`. `next-themes` es la excepción justificada a la regla 6 (anti-parpadeo + estándar shadcn).
+10. **Nombres de archivo en inglés** (ej: `LEARNINGS.md`, no `Aprendizajes.md`). `MEMORY.md` y `AGENTS.md` ya cumplen.
 
 ## Forma de trabajar
 
@@ -45,6 +47,7 @@ components/dashboard/theme-toggle.tsx → botón Sistema/Claro/Oscuro (next-them
 - Al terminar una tarea, actualizalo: estado actual, decisiones importantes (con su por qué) y errores a evitar.
 - Mantenlo breve (Máximo ~50 líneas). Resume o elimina lo que ya no aporte.
 - Si algo se convierte en una regla permanente, propón moverlo a 'AGENTS.md' en lugar de dejarlo en la memoria. 
+- Tras una pregunta de código/conceptos (stack, git, herramientas), añade una entrada breve en `LEARNINGS.md` automáticamente. No guardes preguntas ajenas al código (OpenCode, logística, conversación).
 - No guardes nunca datos sensibles (Claves, tokens, datos personales...)
 
 ## Limites

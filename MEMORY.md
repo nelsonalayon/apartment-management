@@ -5,8 +5,10 @@
 - Tests Vitest: 22/22 (`pnpm test`) — cálculos, formato, integridad de datos.
 - Modo oscuro AÑADIDO: 3 estados (Sistema/Claro/Oscuro) con `next-themes`, default **oscuro**, botón en Header.
 - `formatCOP` corrige el NBSP de Intl → "$75.000.000" exacto.
+- `LEARNINGS.md` (nombre en inglés, regla nueva): se llena solo tras cada pregunta de código/conceptos; las preguntas ajenas al código no se guardan.
 
 ## Decisiones importantes (y por qué)
+- Sin backend, auth ni DB por ahora (decisión original): el objetivo es un producto mostrable; los datos mock se reemplazarán por una API después.
 - Todo cálculo deriva de `data/mock-data.ts`; nunca guardar valores calculados.
 - Server Component + un solo `"use client"` (`installments-section`, `theme-toggle` por estado).
 - Sin librerías de gráficas: barras con `div` + Tailwind.
@@ -21,3 +23,4 @@
 - Chequeos HTML con entidades UTF-8 → falsos negativos; leer `RawContentStream` como UTF8.
 - Matar el servidor del puerto 3000 antes de `pnpm build` (si no, sirve build viejo o choca).
 - El bloque `nextjs-agent-rules` de AGENTS.md lo re-escribe `next dev`: no quitarlo del diff.
+- OpenCode: si la sesión nace en la carpeta padre, NO descubre `.opencode/commands/` del proyecto (solo mira desde el cwd hacia arriba). Abrir OpenCode desde `elemental-app-ia`.
