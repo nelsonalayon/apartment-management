@@ -39,3 +39,18 @@ la TUI es una pantalla viva que se navega con el teclado.
   Vitest es una TUI real (flechas para navegar, `q` para salir).
 - **Ver más:** [Wikipedia: Text-based user interface](https://en.wikipedia.org/wiki/Text-based_user_interface)
   · [Vitest: Watch Mode](https://vitest.dev/guide/features#watch-mode)
+
+## ¿Qué es YAML?
+
+**Por qué importa:** *YAML Ain't Markup Language* — formato de texto para
+escribir datos y configuración legibles por humanos (`clave: valor`, listas
+con `-`, anidado por sangría con espacios). Se usa en frontmatter de Markdown,
+`opencode.json`, GitHub Actions, docker-compose... Casi cualquier `:` o mala
+sangría lo rompe: valores con `:` o saltos de línea suelen requerir comillas.
+
+- **En el proyecto:** frontmatter de `.agents/skills/local-dates/SKILL.md`
+  (`name`, `description`) y `opencode`/`next.config.ts` (este, TypeScript).
+- **Prueba:** pegar un fragmento en https://play.yaml.com y romperlo a propósito
+  (agregar `:` y un salto de línea) para ver el error.
+- **Ver más:** [yaml.org (oficial)](https://yaml.org/) · [YAML Playground](https://play.yaml.com)
+  · [MDN: YAML](https://developer.mozilla.org/en-US/docs/Glossary/YAML)
