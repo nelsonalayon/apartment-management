@@ -8,9 +8,17 @@ import {
 } from "@/components/ui/card";
 import type { UserSummary } from "@/lib/calculations";
 import { formatCOP } from "@/lib/format";
+import type { Apartment } from "@/lib/types";
 
 /** Tarjeta con la información de un usuario. */
-function UserCard({ summary }: { summary: UserSummary }) {
+function UserCard({
+  summary,
+  codigoByRef,
+}: {
+  summary: UserSummary;
+  /** Referencia larga → código corto ("101"/"202"). */
+  codigoByRef: Map<string, string>;
+}) {
   const cuotasLabel =
     summary.cuotasPagadas === 1
       ? "1 cuota pagada"
@@ -36,7 +44,7 @@ function UserCard({ summary }: { summary: UserSummary }) {
           ) : (
             summary.apartamentos.map((apartmentId) => (
               <Badge key={apartmentId} variant="outline">
-                Apto {apartmentId}
+                Apto {codigoByRef.get(apartmentId) ?? apartmentId}
               </Badge>
             ))
           )}
@@ -47,11 +55,23 @@ function UserCard({ summary }: { summary: UserSummary }) {
 }
 
 /** Sección con el resumen de todos los usuarios. */
-export function UsersSummary({ summaries }: { summaries: UserSummary[] }) {
+export function UsersSummary({
+  summaries,
+  apartments,
+}: {
+  summaries: UserSummary[];
+  apartments: Apartment[];
+}) {
+  const codigoByRef = new Map(apartments.map((a) => [a.id, a.codigo]));
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {summaries.map((summary) => (
-        <UserCard key={summary.user.id} summary={summary} />
+        <UserCard
+          key={summary.user.id}
+          summary={summary}
+          codigoByRef={codigoByRef}
+        />
       ))}
     </div>
   );

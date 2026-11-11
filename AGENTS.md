@@ -63,6 +63,7 @@ Orden obligatorio al terminar cada tarea:
 1. `pnpm test` — tests unitarios (Vitest) de cálculos, formato e integridad de los datos mock.
 2. `pnpm build` — debe compilar sin errores de TypeScript.
 3. `pnpm lint` — sin errores de ESLint.
+4. Verifica con el MCP de Chrome DevTools, prueba la funcionalidad, revisa la consola y comprueba la vista movil
 
 Si algo falla, corrige antes de terminar. Los tests viven junto a lo que prueban (`lib/*.test.ts`, `data/*.test.ts`); si cambias una regla de cálculo o formato, actualiza o añade el test que la cubra.
 

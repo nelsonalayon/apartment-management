@@ -3,7 +3,8 @@
 ## Estado actual
 - MVP dashboard cuota inicial conectado a **MySQL real** (`sistema_propiedad`, Workbench) vía `mysql2` — sin API REST ni fallback a mock. Últimos commits: `feat` conexión MySQL y `docs` plantilla LEARNINGS enseñable.
 - Datos al día hasta oct-2026 (10 nov 2026): 5 cuotas marcadas pagadas + 4 pagos insertados siguiendo la convención existente (fecha_pago = vencimiento, idperson = quien_debe_pagar, valor = valor_cuota); el pago 36 quedó consistente con su cuota 77. Backup previo en `backups/` (gitignored).
-- Tests Vitest: **29/29** (`pnpm test`) — cálculos (incl. extras), formato, integridad de fixtures.
+- Tests Vitest: **30/30** (`pnpm test`) — cálculos (incl. extras), formato, integridad de fixtures (incl. `codigo` corto).
+- Códigos cortos (11 nov 2026): badge/filtros muestran **"Apto 101"/"Apto 202"** (no la referencia larga). Campo `codigo` en `Apartment`, derivado en `data/db.ts` (`CODIGOS_CORTOS` por nombre); `id`/`apartmentId` siguen siendo la referencia larga (clave de unión).
 - `LEARNINGS.md`: plantilla "enseñable" en español (título-pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales verificados).
 - Modo oscuro: 3 estados con `next-themes`, default **oscuro**, botón en Header. `formatCOP` corrige el NBSP de Intl → "$75.000.000".
 - Rediseño visual (11 nov 2026, skill `frontend-design`): hero con avance general (`text-6xl`) + franja hairline de stats; Geist como única `--font-sans` (Inter eliminado); `lang="es"`; sin sombras; badge "Datos reales"; `motion-reduce` en barras y skeleton.

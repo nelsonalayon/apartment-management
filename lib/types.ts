@@ -5,9 +5,11 @@
 
 /** Apartamento con sus datos generales. */
 export type Apartment = {
-  /** Identificador corto, ej. "101". */
+  /** Identificador único y clave de unión con las cuotas (referencia de la BD). */
   id: string;
-  /** Nombre visible, ej. "Apartamento 101". */
+  /** Código corto para mostrar, ej. "101" (como lo llama el negocio). */
+  codigo: string;
+  /** Nombre visible, ej. "Torre 1". */
   nombre: string;
   /** Valor total del apartamento en pesos. */
   valorTotal: number;

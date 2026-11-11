@@ -13,12 +13,14 @@ import type { Apartment, Installment, User } from "@/lib/types";
 export const apartments: Apartment[] = [
   {
     id: "101",
+    codigo: "101",
     nombre: "Apartamento 101",
     valorTotal: 180_000_000,
     cuotaInicial: 36_000_000,
   },
   {
     id: "202",
+    codigo: "202",
     nombre: "Apartamento 202",
     valorTotal: 140_000_000,
     cuotaInicial: 28_000_000,

@@ -59,6 +59,16 @@ interface ExtraPaymentRow extends RowDataPacket {
   quien_pago: number | null;
 }
 
+/**
+ * Códigos cortos que usa el negocio ("apartamentos 101 y 202").
+ * La BD solo guarda la referencia larga, así que se deriva aquí
+ * (capa de datos) y los componentes solo lo muestran.
+ */
+const CODIGOS_CORTOS: Record<string, string> = {
+  "Torre 1": "101",
+  "Torre 2": "202",
+};
+
 /** Apartamentos reales (tabla `apartamento`). */
 export async function getApartments(): Promise<Apartment[]> {
   const [rows] = await pool.query<ApartmentRow[]>(
@@ -69,7 +79,10 @@ export async function getApartments(): Promise<Apartment[]> {
      FROM apartamento
      ORDER BY nombre_apartamento`
   );
-  return rows;
+  return rows.map((row) => ({
+    ...row,
+    codigo: CODIGOS_CORTOS[row.nombre] ?? row.nombre,
+  }));
 }
 
 /** Pagadores reales (tabla `persona`). */

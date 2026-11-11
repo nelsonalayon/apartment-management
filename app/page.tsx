@@ -92,7 +92,7 @@ async function DashboardContent() {
       {/* ---------- Usuarios ---------- */}
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold tracking-tight">Usuarios</h2>
-        <UsersSummary summaries={userSummaries} />
+        <UsersSummary summaries={userSummaries} apartments={apartments} />
       </section>
 
       {/* ---------- Cuotas ---------- */}

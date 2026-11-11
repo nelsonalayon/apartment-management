@@ -115,6 +115,7 @@ describe("getUserSummary", () => {
 describe("límites de avance", () => {
   const fakeApartment: Apartment = {
     id: "x",
+    codigo: "x",
     nombre: "Apartamento de prueba",
     valorTotal: 100_000,
     cuotaInicial: 500_000,
@@ -165,6 +166,7 @@ describe("pagos adicionales (extras)", () => {
   it("el avance con extras nunca supera 100%", () => {
     const fakeApartment: Apartment = {
       id: "x",
+      codigo: "x",
       nombre: "Apartamento de prueba",
       valorTotal: 100_000,
       cuotaInicial: 500_000,

@@ -69,4 +69,12 @@ describe("datos mock", () => {
       expect(pagadas.length).toBeGreaterThan(0);
     }
   });
+
+  it("todo apartamento tiene un código corto para mostrar", () => {
+    for (const apartment of apartments) {
+      expect(apartment.codigo).toBeTruthy();
+      // Debe ser corto (ej. "101"), nunca la referencia larga.
+      expect(apartment.codigo.length).toBeLessThanOrEqual(6);
+    }
+  });
 });

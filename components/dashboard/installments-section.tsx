@@ -68,6 +68,12 @@ export function InstallmentsSection({
   const [estado, setEstado] = useState<EstadoFilter>("todas");
   const [apartmentId, setApartmentId] = useState("todos");
 
+  // Referencia larga → código corto ("101"/"202") para mostrar en la tabla.
+  const codigoByRef = useMemo(
+    () => new Map(apartments.map((a) => [a.id, a.codigo])),
+    [apartments]
+  );
+
   const filtered = useMemo(
     () =>
       installments.filter(
@@ -110,7 +116,7 @@ export function InstallmentsSection({
               { value: "todos", label: "Todos" },
               ...apartments.map((apartment) => ({
                 value: apartment.id,
-                label: `Apto ${apartment.id}`,
+                label: `Apto ${apartment.codigo}`,
               })),
             ]}
           />
@@ -140,7 +146,10 @@ export function InstallmentsSection({
                 <TableRow key={cuota.id}>
                   <TableCell className="font-medium">#{cuota.numero}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">Apto {cuota.apartmentId}</Badge>
+                    <Badge variant="outline">
+                      Apto{" "}
+                      {codigoByRef.get(cuota.apartmentId) ?? cuota.apartmentId}
+                    </Badge>
                   </TableCell>
                   <TableCell className="tabular-nums">
                     {formatCOP(cuota.valor)}
