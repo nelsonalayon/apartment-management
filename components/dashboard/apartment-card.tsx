@@ -1,7 +1,5 @@
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -30,21 +28,30 @@ function Info({
   );
 }
 
-/** Tarjeta con toda la información de un apartamento. */
+/** Tarjeta de apartamento: el porcentaje de avance es el protagonista. */
 export function ApartmentCard({ summary }: { summary: ApartmentSummary }) {
   const { apartment } = summary;
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle>{apartment.nombre}</CardTitle>
         <CardDescription>{summary.totalCuotas} cuotas en total</CardDescription>
-        <CardAction>
-          <Badge variant="outline">{formatPercent(summary.avance)} de avance</Badge>
-        </CardAction>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-5">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-4xl font-semibold tracking-tight tabular-nums">
+              {formatPercent(summary.avance)}
+            </span>
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {summary.cuotasPagadas} de {summary.totalCuotas} pagadas
+            </span>
+          </div>
+          <ProgressBar value={summary.avance} className="h-3" />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <Info label="Valor total" value={formatCOP(apartment.valorTotal)} />
           <Info
@@ -66,16 +73,6 @@ export function ApartmentCard({ summary }: { summary: ApartmentSummary }) {
             label="Cuotas pendientes"
             value={String(summary.cuotasPendientes)}
           />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Avance</span>
-            <span className="font-medium tabular-nums">
-              {formatPercent(summary.avance)}
-            </span>
-          </div>
-          <ProgressBar value={summary.avance} />
         </div>
       </CardContent>
     </Card>

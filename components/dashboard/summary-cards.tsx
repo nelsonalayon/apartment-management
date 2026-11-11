@@ -1,71 +1,52 @@
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import type { GeneralSummary } from "@/lib/calculations";
-import { formatCOP, formatPercent } from "@/lib/format";
-import { ProgressBar } from "./progress-bar";
+import { formatCOP } from "@/lib/format";
 import { cn } from "cn";
 
-type StatCardProps = {
-  title: string;
+type StatProps = {
+  label: string;
   value: string;
-  /** Resalta el valor en color principal (verde esmerald). */
-  highlight?: boolean;
-  /** Si se indica, muestra una barra de progreso debajo del valor. */
-  progress?: number;
+  /** Resalta la cifra con color semántico (verde = pagada, ámbar = pendiente). */
+  className?: string;
 };
 
-function StatCard({ title, value, highlight, progress }: StatCardProps) {
+/** Celda de la franja de estadísticas. */
+function Stat({ label, value, className }: StatProps) {
   return (
-    <Card className="shadow-sm">
-      <CardHeader>
-        <CardDescription>{title}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <span
-          className={cn(
-            "text-2xl font-bold tabular-nums",
-            highlight && "text-primary"
-          )}
-        >
-          {value}
-        </span>
-        {progress !== undefined && <ProgressBar value={progress} />}
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-1 bg-card p-4 sm:p-5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className={cn("text-lg font-semibold tabular-nums sm:text-xl", className)}>
+        {value}
+      </span>
+    </div>
   );
 }
 
-/** Tarjetas del resumen general (parte superior del dashboard). */
+/**
+ * Franja de estadísticas secundarias del resumen general.
+ * Un solo bloque con separadores hairline (gap-px sobre bg-border)
+ * en lugar de tarjetas repetidas: el protagonismo lo tiene el hero.
+ */
 export function SummaryCards({ summary }: { summary: GeneralSummary }) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        title="Total de apartamentos"
-        value={String(summary.totalApartamentos)}
-      />
-      <StatCard
-        title="Total de la cuota inicial"
-        value={formatCOP(summary.totalCuotaInicial)}
-      />
-      <StatCard
-        title="Total pagado"
-        value={formatCOP(summary.totalPagado)}
-        highlight
-      />
-      <StatCard
-        title="Total pendiente"
-        value={formatCOP(summary.totalPendiente)}
-      />
-      <StatCard title="Cuotas pagadas" value={String(summary.cuotasPagadas)} />
-      <StatCard
-        title="Cuotas pendientes"
-        value={String(summary.cuotasPendientes)}
-      />
-      <StatCard
-        title="Avance general"
-        value={formatPercent(summary.avance)}
-        highlight
-        progress={summary.avance}
-      />
-    </div>
+    <Card className="py-0">
+      <CardContent className="grid grid-cols-2 gap-px bg-border p-0 sm:grid-cols-4">
+        <Stat label="Apartamentos" value={String(summary.totalApartamentos)} />
+        <Stat
+          label="Cuota inicial total"
+          value={formatCOP(summary.totalCuotaInicial)}
+        />
+        <Stat
+          label="Cuotas pagadas"
+          value={String(summary.cuotasPagadas)}
+          className="text-primary"
+        />
+        <Stat
+          label="Cuotas pendientes"
+          value={String(summary.cuotasPendientes)}
+          className="text-amber-600 dark:text-amber-400"
+        />
+      </CardContent>
+    </Card>
   );
 }

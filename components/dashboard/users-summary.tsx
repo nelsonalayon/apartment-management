@@ -17,7 +17,7 @@ function UserCard({ summary }: { summary: UserSummary }) {
       : `${summary.cuotasPagadas} cuotas pagadas`;
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle>{summary.user.nombre}</CardTitle>
         <CardDescription>{cuotasLabel}</CardDescription>

@@ -6,6 +6,7 @@
 - Tests Vitest: **29/29** (`pnpm test`) — cálculos (incl. extras), formato, integridad de fixtures.
 - `LEARNINGS.md`: plantilla "enseñable" en español (título-pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales verificados).
 - Modo oscuro: 3 estados con `next-themes`, default **oscuro**, botón en Header. `formatCOP` corrige el NBSP de Intl → "$75.000.000".
+- Rediseño visual (11 nov 2026, skill `frontend-design`): hero con avance general (`text-6xl`) + franja hairline de stats; Geist como única `--font-sans` (Inter eliminado); `lang="es"`; sin sombras; badge "Datos reales"; `motion-reduce` en barras y skeleton.
 
 ## Decisiones importantes (y por qué)
 - **Datos:** `data/db.ts` (pool mysql2 + 4 queries) es la única fuente en runtime; `data/mock-data.ts` queda solo como fixture de tests. Los componentes no se tocaron (mismos tipos `lib/types.ts`).
@@ -14,6 +15,7 @@
 - **Next 16 Cache Components:** datos frescos por request → `DashboardContent` async detrás de `<Suspense>` + streaming. NO `'use cache'`, NO prerender con BD en build. Leído de `node_modules/next/dist/docs/` (06-fetching-data, 08-caching).
 - **`dateStrings: true`** → fechas "YYYY-MM-DD" directas para `lib/format.ts`.
 - `mysql2` es la 1ª excepción justificada a "sin dependencias" (junto a `next-themes`).
+- **Rediseño sin dependencias nuevas:** Geist ya estaba importada en `layout.tsx` (solo se rewiró a `--font-sans`); semántica de color constante: emerald = pagado, ámbar = pendiente (siempre con variante `dark:`).
 
 ## Errores a evitar
 - **PowerShell `node -e` rompe las comillas del SQL** → escribir `scripts/*.mjs` y correr `node scripts/x.mjs` (hay `scripts/db-diagnostic.mjs`).

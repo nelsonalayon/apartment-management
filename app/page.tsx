@@ -3,6 +3,7 @@ import { ApartmentCard } from "@/components/dashboard/apartment-card";
 import { Header } from "@/components/dashboard/header";
 import { InstallmentsSection } from "@/components/dashboard/installments-section";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
+import { SummaryHero } from "@/components/dashboard/summary-hero";
 import { UsersSummary } from "@/components/dashboard/users-summary";
 import {
   getApartments,
@@ -38,13 +39,17 @@ export default function Home() {
 function DashboardLoading() {
   return (
     <section
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-8"
       aria-busy="true"
       aria-live="polite"
     >
-      <p className="animate-pulse text-muted-foreground">
-        Cargando datos de la base de datos...
-      </p>
+      <span className="sr-only">Cargando datos de la base de datos...</span>
+      <div className="h-44 animate-pulse rounded-xl bg-muted motion-reduce:animate-none" />
+      <div className="h-24 animate-pulse rounded-xl bg-muted motion-reduce:animate-none" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="h-56 animate-pulse rounded-xl bg-muted motion-reduce:animate-none" />
+        <div className="h-56 animate-pulse rounded-xl bg-muted motion-reduce:animate-none" />
+      </div>
     </section>
   );
 }
@@ -68,11 +73,9 @@ async function DashboardContent() {
 
   return (
     <>
-      {/* ---------- Resumen general ---------- */}
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold tracking-tight">
-          Resumen general
-        </h2>
+      {/* ---------- Resumen general (hero + franja de stats) ---------- */}
+      <section className="flex flex-col gap-4" aria-label="Resumen general">
+        <SummaryHero summary={general} />
         <SummaryCards summary={general} />
       </section>
 

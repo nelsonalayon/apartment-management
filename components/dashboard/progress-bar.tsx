@@ -25,7 +25,7 @@ export function ProgressBar({ value, className }: ProgressBarProps) {
       )}
     >
       <div
-        className="h-full rounded-full bg-primary transition-all"
+        className="h-full rounded-full bg-primary transition-all motion-reduce:transition-none"
         style={{ width: `${safeValue}%` }}
       />
     </div>
