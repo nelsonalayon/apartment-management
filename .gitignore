@@ -42,3 +42,19 @@ next-env.d.ts
 
 # backups locales de la BD (no commitear)
 /backups/
+
+# agentes: skills de terceros instaladas (regenerables vía skills-lock.json)
+# se conserva solo local-dates/ (skill propia del proyecto)
+/.agents/skills/*
+!/.agents/skills/local-dates/
+/skills/
+/data/skills/
+
+# directorios de otras herramientas de agente (no se usan en este proyecto)
+/.claude/
+/.aider-desk/
+/.augment/
+/.autohand/
+/.bob/
+/.codeartsdoer/
+/.codebuddy/

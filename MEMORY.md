@@ -17,6 +17,7 @@
 - **`dateStrings: true`** → fechas "YYYY-MM-DD" directas para `lib/format.ts`.
 - `mysql2` es la 1ª excepción justificada a "sin dependencias" (junto a `next-themes`).
 - **Rediseño sin dependencias nuevas:** Geist ya estaba importada en `layout.tsx` (solo se rewiró a `--font-sans`); semántica de color constante: emerald = pagado, ámbar = pendiente (siempre con variante `dark:`).
+- **Archivos de agentes:** subir solo los propios (`opencode.json`, `.opencode/`, `skills-lock.json`, `.agents/skills/local-dates`); ignorar skills de terceros y sus copias (`.claude/`, `.aider-desk/`...) — regenerables con el instalador.
 
 ## Errores a evitar
 - **PowerShell `node -e` rompe las comillas del SQL** → escribir `scripts/*.mjs` y correr `node scripts/x.mjs` (hay `scripts/db-diagnostic.mjs`).
