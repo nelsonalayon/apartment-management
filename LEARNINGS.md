@@ -54,3 +54,20 @@ sangría lo rompe: valores con `:` o saltos de línea suelen requerir comillas.
   (agregar `:` y un salto de línea) para ver el error.
 - **Ver más:** [yaml.org (oficial)](https://yaml.org/) · [YAML Playground](https://play.yaml.com)
   · [MDN: YAML](https://developer.mozilla.org/en-US/docs/Glossary/YAML)
+
+## ¿Qué es E2E HTTP?
+
+**Por qué importa:** E2E = *End-to-End*: prueba del flujo completo de un
+usuario real a través de todas las capas (cliente → servidor → BD). La variante
+"por HTTP" hace ese flujo hablando directamente con el servidor (`fetch`/`curl`)
+en vez de con un navegador: se comprueban redirects, cookies y el HTML de la
+respuesta, sin JS del cliente. Más ligero que Playwright, pero no verifica lo
+visual.
+
+- **En el proyecto:** verificación del login con un script temporal fuera del
+  repo (15 checks: `/` protegida, PIN correcto/incorrecto, cookie de 30 días,
+  logout) — ruta protegida `app/page.tsx`, actions en `app/actions/auth.ts`.
+- **Prueba:** `curl -i http://localhost:3000/` sin sesión → verás
+  `location: /login` (o el meta refresh del streaming en rutas con `<Suspense>`).
+- **Ver más:** [Playwright: end-to-end testing](https://playwright.dev/docs/intro)
+  · [MDN: HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP)
