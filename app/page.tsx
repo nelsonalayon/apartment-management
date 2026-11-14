@@ -11,6 +11,7 @@ import {
   getInstallments,
   getUsers,
 } from "@/data/db";
+import { requireUser } from "@/lib/session";
 import {
   getApartmentSummary,
   getGeneralSummary,
@@ -56,6 +57,10 @@ function DashboardLoading() {
 
 /** Consulta la BD y arma los resúmenes con cálculos puros. */
 async function DashboardContent() {
+  // Sin sesión válida no hay dashboard (detrás de <Suspense>, como
+  // exige Cache Components para leer cookies()).
+  await requireUser();
+
   const [apartments, users, installments, extras] = await Promise.all([
     getApartments(),
     getUsers(),

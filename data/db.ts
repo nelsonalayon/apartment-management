@@ -37,6 +37,11 @@ interface UserRow extends RowDataPacket {
   nombre: string;
 }
 
+/** Fila de `persona` con el hash del PIN (login). */
+interface UserPinRow extends RowDataPacket {
+  pin_hash: string | null;
+}
+
 /** Fila de `cuotas` con la fecha de pago desde el JOIN con `pagos`. */
 interface InstallmentRow extends RowDataPacket {
   idcuota: number;
@@ -91,6 +96,28 @@ export async function getUsers(): Promise<User[]> {
     `SELECT idperson AS id, nombre FROM persona ORDER BY nombre`
   );
   return rows.map((row) => ({ id: String(row.id), nombre: row.nombre }));
+}
+
+/** Usuario por su id (para revalidar la sesión al leerla). null si no existe. */
+export async function getUserById(id: string): Promise<User | null> {
+  const [rows] = await pool.query<UserRow[]>(
+    `SELECT idperson AS id, nombre FROM persona WHERE idperson = ?`,
+    [id]
+  );
+  const row = rows[0];
+  return row ? { id: String(row.id), nombre: row.nombre } : null;
+}
+
+/**
+ * Hash scrypt del PIN de un usuario (columna `pin_hash` de `persona`).
+ * null si el usuario no tiene PIN asignado → no puede iniciar sesión.
+ */
+export async function getUserPinHash(id: string): Promise<string | null> {
+  const [rows] = await pool.query<UserPinRow[]>(
+    `SELECT pin_hash FROM persona WHERE idperson = ?`,
+    [id]
+  );
+  return rows[0]?.pin_hash ?? null;
 }
 
 /**

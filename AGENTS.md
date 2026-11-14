@@ -9,20 +9,26 @@
 
 ## Estructura
 
-Proyecto: MVP para controlar el pago de la cuota inicial de dos apartamentos (101 y 202) con 4 usuarios. Datos reales desde MySQL local (Workbench), sin backend, autenticación ni API REST.
+Proyecto: MVP para controlar el pago de la cuota inicial de dos apartamentos (101 y 202) con 4 usuarios que inician sesión con PIN. Datos reales desde MySQL local (Workbench); sin API REST: el login usa Server Actions + cookie firmada.
 
 ```
 app/                    → App Router; page.tsx es el dashboard (Server Component)
+app/login/              → página de login (Server Component + Suspense)
+app/actions/auth.ts     → Server Actions de login/logout
 components/dashboard/   → componentes propios del dashboard
+components/login/       → formulario de login (cliente)
 components/ui/          → componentes shadcn/ui (no editar salvo necesidad)
 data/db.ts              → capa de datos MySQL (pool + consultas; ÚNICA fuente en runtime)
 data/mock-data.ts       → datos mock (solo fixture de los tests)
 lib/types.ts            → tipos compartidos (Apartment, User, Installment, ExtraPayment)
 lib/calculations.ts     → funciones puras de cálculo
 lib/format.ts           → formatCOP, formatPercent, formatDate
+lib/auth.ts             → PINs (scrypt) y firma HMAC de sesión (puro, con tests)
+lib/session.ts          → cookie de sesión (SESSION_SECRET en .env.local)
 components/dashboard/theme-toggle.tsx → botón Sistema/Claro/Oscuro (next-themes)
 LEARNINGS.md            → aprendizajes de preguntas de código (plantilla en español)
 scripts/db-diagnostic.mjs → muestra el esquema real de la BD (node scripts/db-diagnostic.mjs)
+scripts/set-pins.mts    → crea persona.pin_hash y asigna PINs (node scripts/set-pins.mts [--reset])
 ```
 
 ## Reglas de código
@@ -33,7 +39,7 @@ scripts/db-diagnostic.mjs → muestra el esquema real de la BD (node scripts/db-
 4. **Server/Client Components:** las páginas son Server Components por defecto (calculan en el servidor y pasan props). Agregar `"use client"` solo cuando haya estado, efectos o manejadores de eventos (como los filtros de `installments-section.tsx`).
 5. **Componentes pequeños:** uno por archivo en `components/dashboard/`, reutilizando `ProgressBar`, `StatusBadge` y los componentes shadcn.
 6. **Sin dependencias nuevas** sin justificarlo explícitamente. No hay librerías de gráficas: las barras de progreso son `div` + Tailwind.
-7. **Alcance del MVP:** no agregar login, backend, formularios de pagos, notificaciones, exportaciones ni funcionalidades no solicitadas.
+7. **Alcance del MVP:** no agregar backend/API REST, formularios de pagos, notificaciones, exportaciones ni funcionalidades no solicitadas. El login de los 4 usuarios está en alcance (solicitado el 14 nov 2026): Server Actions + cookie firmada, PINs con hash scrypt en `persona.pin_hash`.
 8. **Estilo:** usar shadcn/ui y las clases existentes del tema (zinc + emerald). Diseño responsive (grids `sm:`/`md:`/`lg:`).
 9. **Tema oscuro:** el selector está en el Header (`theme-toggle.tsx`) con 3 estados (Sistema/Claro/Oscuro) vía `next-themes` — default "oscuro". Usar siempre los tokens del tema (`bg-background`, `text-foreground`, `bg-card`, `text-muted-foreground`...); **prohibido** colores fijos (`bg-white`, `text-amber-600`...) sin su variante `dark:`. `next-themes` es la excepción justificada a la regla 6 (anti-parpadeo + estándar shadcn).
 10. **Nombres de archivo en inglés** (ej: `LEARNINGS.md`, no `Aprendizajes.md`). `MEMORY.md` y `AGENTS.md` ya cumplen.
