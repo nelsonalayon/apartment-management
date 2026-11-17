@@ -9,6 +9,7 @@
 - `LEARNINGS.md`: plantilla "enseñable" en español (título-pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales verificados).
 - Modo oscuro: 3 estados con `next-themes`, default **oscuro**, botón en Header. `formatCOP` corrige el NBSP de Intl → "$75.000.000".
 - Rediseño visual (11 nov 2026, skill `frontend-design`): hero con avance general (`text-6xl`) + franja hairline de stats; Geist como única `--font-sans` (Inter eliminado); `lang="es"`; sin sombras; badge "Datos reales"; `motion-reduce` en barras y skeleton.
+- **Metodología de tareas complejas** (17 nov 2026, en `AGENTS.md`): escala **1-10 con tope 10**; división en etapas obligatoria desde **6**; **10 = ALERTA** (descomponer en tareas pequeñas e independientes antes de empezar);5 criterios de división y ejecución etapa a etapa (verificar → aprobación → commit).
 
 ## Decisiones importantes (y por qué)
 - **Datos:** `data/db.ts` (pool mysql2 + 4 queries) es la única fuente en runtime; `data/mock-data.ts` queda solo como fixture de tests. Los componentes no se tocaron (mismos tipos `lib/types.ts`).

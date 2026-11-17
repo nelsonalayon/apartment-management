@@ -50,6 +50,41 @@ scripts/set-pins.mts    → crea persona.pin_hash y asigna PINs (node scripts/se
 - Cambios pequeños y enfocados: no reescribas lo que ya funciona.
 - Al terminar, resume que has cambiado y cualquier decisión que deba revisar.
 
+## Metodología de tareas complejas
+
+**Calificación (escala 1-10, tope 10).** Al recibir una tarea no trivial, el
+agente la califica con 5 criterios: alcance (archivos/páginas afectados),
+riesgo (datos reales, seguridad), dependencias externas (BD, red, servicios),
+incertidumbre (camino explorado) y esfuerzo de verificación. Se comunica la
+calificación al usuario. Si la tarea supera el 10, se otorga 10 (tope).
+- **1-3:** ejecutar directamente.
+- **4-5:** proponer el enfoque en 1-2 frases y ejecutar.
+- **6-9:** NO tocar código hasta dividirla en etapas y que el usuario apruebe
+  el plan (objetivo + verificación de cada etapa).
+- **10 = ALERTA:** no se intenta hacer de una. Primero se descompone en
+  tareas pequeñas e independientes (cada una se califica de nuevo y debería
+  quedar por debajo de 10), y solo entonces se ejecutan una a una.
+
+**Criterios de división:**
+1. Cada etapa = una entrega verificable de extremo a extremo (se prueba sola).
+2. Cada etapa = 1 commit revisible, con el mínimo de archivos posible.
+3. El repo nunca queda roto: al cerrar cada etapa pasan test, build y lint.
+4. Orden: primero lo que desbloquea lo demás; incertidumbre y riesgo antes
+   que pulido.
+5. Independencia: cada tarea pequeña se ejecuta, verifica y cierra por
+   separado; su verificación no depende de que continúe la siguiente.
+
+**Ejecución, una etapa a la vez:**
+1. Implementar solo la etapa actual.
+2. Verificar: suite + comprobación funcional de la etapa (regla 4).
+3. Pedir revisión y aprobación al usuario.
+4. Commit (push solo si lo pide) → siguiente etapa. Actualizar MEMORY.md al
+   cerrar cada etapa si hay decisiones nuevas, y siempre al cerrar la tarea.
+
+Ejemplos: cambiar una clase = 1 · fix de estilo = 2 · bug acotado = 4-5 ·
+login completo = 9 · publicar en internet = 9 · migrar la BD a la nube = 10
+(alerta: descomponer primero).
+
 ## Memoria
 - Al empezar, lee 'MEMORY.md' para conocer el estado del proyecto y las decisiones tomadas.
 - Al terminar una tarea, actualizalo: estado actual, decisiones importantes (con su por qué) y errores a evitar.
