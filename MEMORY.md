@@ -32,4 +32,5 @@
 - **Cache Components + auth:** `cookies()` fuera de `<Suspense>` = error de build; `Date.now()` en la cadena de sesión = "unstable value" → `await connection()` en `getCurrentUser()`; bug known de Next (`InvariantError` de cookies al re-renderizar Server Actions en rutas PPR) → try/catch tratando como "sin sesión".
 - **Server Actions por fetch propio: solo `multipart/form-data`** — con `application/x-www-form-urlencoded` el action NO se ejecuta (devuelve la página sin ejecutar nada).
 - Reinicios del server/harness pueden corromper archivos recién escritos (UTF-16/nulos): verificar integridad tras un reinicio.
+- **`<select>` nativo en tema oscuro:** sin colores explícitos en `<option>` (fondo transparente + texto heredado blanco) el popup lo pinta el navegador con fondo claro → nombres invisibles hasta el hover (pasó en Edge). Fix: `bg-popover text-popover-foreground` en cada `<option>`; el `color-scheme: dark` solo no basta.
 - El MCP `chorme-devtools` (typo en `opencode.json`) puede no estar conectado: sus herramientas solo aparecen si la sesión arranca en la carpeta del proyecto — comprobar con `/mcp` o reiniciar; mientras, la regla 4 permite E2E HTTP.

@@ -26,11 +26,17 @@ export function LoginForm({ users }: { users: User[] }) {
           disabled={pending}
           className="border-input dark:bg-input/30 flex h-9 w-full min-w-0 rounded-lg border bg-transparent px-3 py-1 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:opacity-50"
         >
-          <option value="" disabled>
+          {/* Colores explícitos: sin ellos el popup nativo pinta fondo
+              claro y el texto (heredado, blanco en oscuro) queda invisible. */}
+          <option value="" disabled className="bg-popover text-popover-foreground">
             Selecciona tu nombre
           </option>
           {users.map((user) => (
-            <option key={user.id} value={user.id}>
+            <option
+              key={user.id}
+              value={user.id}
+              className="bg-popover text-popover-foreground"
+            >
               {user.nombre}
             </option>
           ))}
