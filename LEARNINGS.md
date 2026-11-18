@@ -78,6 +78,24 @@ efímera.
 - **Ver más:** [Cloudflare: TryCloudflare](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
   · [repo cloudflared (GitHub)](https://github.com/cloudflare/cloudflared)
 
+## ¿Tailscale y Cloudflare son lo mismo?
+
+**Por qué importa:** son empresas con propósitos distintos — Cloudflare es
+infraestructura de la **internet pública** (CDN, DNS, DDoS) y Tailscale es una
+**red privada tipo VPN** (WireGuard) para unir tus dispositivos. Coinciden solo
+en su "tunnel": los dos publican un servicio local con una URL HTTPS saliendo
+desde tu PC sin abrir puertos. Diferencia práctica: el quick tunnel de
+Cloudflare es efímero (URL nueva por reinicio) y el Funnel de Tailscale da
+URL estable gratis, pero exige cuenta.
+
+- **En el proyecto:** A1 usó el quick tunnel de Cloudflare; A3 migró al
+  Funnel de Tailscale (`https://<equipo>.<tailnet>.ts.net`), estable.
+- **Prueba:** `tailscale funnel 3000` → imprime la URL `*.ts.net` y la
+  mantiene aunque reinicies el PC (con el servicio de Tailscale activo).
+- **Ver más:** [Tailscale (oficial)](https://tailscale.com/)
+  · [Tailscale: Funnel](https://tailscale.com/kb/1223/funnel)
+  · [Cloudflare: Quick Tunnels](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
+
 ## ¿Qué es E2E HTTP?
 
 **Por qué importa:** E2E = *End-to-End*: prueba del flujo completo de un
