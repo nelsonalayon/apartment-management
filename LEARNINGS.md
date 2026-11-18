@@ -55,6 +55,22 @@ sangría lo rompe: valores con `:` o saltos de línea suelen requerir comillas.
 - **Ver más:** [yaml.org (oficial)](https://yaml.org/) · [YAML Playground](https://play.yaml.com)
   · [MDN: YAML](https://developer.mozilla.org/en-US/docs/Glossary/YAML)
 
+## ¿Cómo publicar una app local en internet con Cloudflare Tunnel?
+
+**Por qué importa:** un túnel (`cloudflared`) inicia una conexión *saliente*
+hacia Cloudflare y recibe ahí una URL **HTTPS**; el tráfico baja al
+`localhost:3000`. No abres puertos en el router/firewall, no necesitas IP fija
+ni CGNAT — pero el PC debe estar encendido y la URL del *quick tunnel* es
+efímera.
+
+- **En el proyecto:** Etapa A1 (ruta al internet): binario portable en
+  `%LOCALAPPDATA%\cloudflared\` (fuera del repo); el login funciona sin tocar
+  código porque la cookie `secure` de `lib/session.ts` es válida sobre HTTPS.
+- **Prueba:** `cloudflared tunnel --url http://localhost:3000` → copia la URL
+  `https://xxx.trycloudflare.com` y ábrela desde el celular con datos móviles.
+- **Ver más:** [Cloudflare: TryCloudflare](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
+  · [repo cloudflared (GitHub)](https://github.com/cloudflare/cloudflared)
+
 ## ¿Qué es E2E HTTP?
 
 **Por qué importa:** E2E = *End-to-End*: prueba del flujo completo de un

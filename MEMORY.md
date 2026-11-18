@@ -2,6 +2,7 @@
 
 ## Estado actual
 - MVP dashboard cuota inicial conectado a **MySQL real** (`sistema_propiedad`, Workbench) vía `mysql2` — sin API REST ni fallback a mock. Último commit: `da0e9ce` login de los 4 usuarios (pusheado a `origin/master`).
+- **Etapa A1 – app en internet** (18 nov 2026, Ruta A, sin tocar código): túnel **quick tunnel** de Cloudflare. Publicar: `pnpm start` + `"$env:LOCALAPPDATA\cloudflared\cloudflared.exe" tunnel --url http://localhost:3000 --no-autoupdate` → URL `https://xxx.trycloudflare.com` (**efímera**, cambia en cada reinicio). Verificado: E2E 15/15 + login del celular con datos móviles ✅. **Pendiente: A2** (límite de intentos de login) antes de compartir la URL; luego A3 URL estable, A4 arranque auto, A5 cierre.
 - Datos al día hasta oct-2026 (10 nov 2026): 5 cuotas marcadas pagadas + 4 pagos insertados siguiendo la convención existente (fecha_pago = vencimiento, idperson = quien_debe_pagar, valor = valor_cuota); el pago 36 quedó consistente con su cuota 77. Backup previo en `backups/` (gitignored).
 - Tests Vitest: **40/40** (`pnpm test`) — cálculos (incl. extras), formato, integridad de fixtures (incl. `codigo` corto) y auth (`lib/auth.test.ts`).
 - Login de los 4 usuarios (14 nov 2026, commit `da0e9ce`): PIN de 4 dígitos con hash **scrypt** en `persona.pin_hash` (columna nueva; `scripts/set-pins.mts` la crea y asigna PINs, `--reset` regenera — los PINs solo se imprimen una vez). Verificado E2E HTTP: 15/15 (login, logout, protección de rutas, cookie segura). Regla 4 de AGENTS.md admite E2E HTTP como alternativa al MCP de DevTools.
@@ -21,6 +22,7 @@
 - **Rediseño sin dependencias nuevas:** Geist ya estaba importada en `layout.tsx` (solo se rewiró a `--font-sans`); semántica de color constante: emerald = pagado, ámbar = pendiente (siempre con variante `dark:`).
 - **Archivos de agentes:** subir solo los propios (`opencode.json`, `.opencode/`, `skills-lock.json`, `.agents/skills/local-dates`); ignorar skills de terceros y sus copias (`.claude/`, `.aider-desk/`...) — regenerables con el instalador.
 - **Login sin dependencias nuevas:** Server Actions (no Route Handlers → sigue "sin API REST") + cookie firmada HMAC-SHA256, httpOnly/SameSite=lax/30 días; `SESSION_SECRET` solo en `.env.local`. La BD almacena hashes (scrypt+salt), nunca PINs en claro; errores de credenciales genéricos.
+- **Internet vía túnel desde el PC (Ruta A)** elegida sobre nube/Vercel: gratis, sin migrar MySQL, etapas pequeñas; contra: el PC debe estar encendido. `cloudflared.exe` vive en `%LOCALAPPDATA%\cloudflared\` (fuera del repo) — **cero config en el proyecto** ni cuenta de Cloudflare en A1.
 
 ## Errores a evitar
 - **PowerShell `node -e` rompe las comillas del SQL** → escribir `scripts/*.mjs` y correr `node scripts/x.mjs` (hay `scripts/db-diagnostic.mjs`).
@@ -35,3 +37,6 @@
 - Reinicios del server/harness pueden corromper archivos recién escritos (UTF-16/nulos): verificar integridad tras un reinicio.
 - **`<select>` nativo en tema oscuro:** sin colores explícitos en `<option>` (fondo transparente + texto heredado blanco) el popup lo pinta el navegador con fondo claro → nombres invisibles hasta el hover (pasó en Edge). Fix: `bg-popover text-popover-foreground` en cada `<option>`; el `color-scheme: dark` solo no basta.
 - El MCP `chorme-devtools` (typo en `opencode.json`) puede no estar conectado: sus herramientas solo aparecen si la sesión arranca en la carpeta del proyecto — comprobar con `/mcp` o reiniciar; mientras, la regla 4 permite E2E HTTP.
+- **`pnpm start` falla con `EADDRINUSE :::3000`:** proceso `node` huérfano (reinicios cancelan la terminal pero no al proceso) que puede quedar **colgado escuchando sin responder** → `Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }` y relanzar.
+- **`cloudflared` dispara el firewall de Windows** la primera vez → permitir solo en **Redes privadas** (la red de casa es perfil Privada); no marcar públicas.
+- **No correr `pnpm build` mientras `next start` sirve la web pública:** reescribe `.next` en caliente. Primero parar el servidor (matar puerto 3000), build, y relanzar server + túnel (la URL cambiará).
