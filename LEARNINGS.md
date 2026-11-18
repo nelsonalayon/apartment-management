@@ -69,6 +69,8 @@ efímera.
 - **Cuánto dura:** la URL vive mientras corre `cloudflared`, pero Cloudflare
   **no garantiza uptime** y el hostname es nuevo en cada arranque (es una URL
   de *testing*; en nuestras pruebas caducó a las ~2 h con `Tunnel not found`).
+  URL estable con Cloudflare = *named tunnel* + **dominio propio** (~$10-12/año)
+  o, gratis, el Funnel de Tailscale (`*.ts.net`, requiere cuenta).
 - **Prueba:** `cloudflared tunnel --url http://localhost:3000` → copia la URL
   `https://xxx.trycloudflare.com` y ábrela desde el celular con datos móviles.
 - **Barrera extra sin código (solo quick tunnels):** `--allowed-mail 'a@x,b@y'`
