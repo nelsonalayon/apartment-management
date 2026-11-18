@@ -71,6 +71,10 @@ efímera.
   de *testing*; en nuestras pruebas caducó a las ~2 h con `Tunnel not found`).
 - **Prueba:** `cloudflared tunnel --url http://localhost:3000` → copia la URL
   `https://xxx.trycloudflare.com` y ábrela desde el celular con datos móviles.
+- **Barrera extra sin código (solo quick tunnels):** `--allowed-mail 'a@x,b@y'`
+  pide un código de un solo uso enviado al correo antes de cargar la app; no
+  toca la BD ni el login propio (los PIN siguen igual), pero bloquea los
+  scripts E2E (clientes no interactivos).
 - **Ver más:** [Cloudflare: TryCloudflare](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
   · [repo cloudflared (GitHub)](https://github.com/cloudflare/cloudflared)
 
