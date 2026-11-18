@@ -66,6 +66,9 @@ efímera.
 - **En el proyecto:** Etapa A1 (ruta al internet): binario portable en
   `%LOCALAPPDATA%\cloudflared\` (fuera del repo); el login funciona sin tocar
   código porque la cookie `secure` de `lib/session.ts` es válida sobre HTTPS.
+- **Cuánto dura:** la URL vive mientras corre `cloudflared`, pero Cloudflare
+  **no garantiza uptime** y el hostname es nuevo en cada arranque (es una URL
+  de *testing*; en nuestras pruebas caducó a las ~2 h con `Tunnel not found`).
 - **Prueba:** `cloudflared tunnel --url http://localhost:3000` → copia la URL
   `https://xxx.trycloudflare.com` y ábrela desde el celular con datos móviles.
 - **Ver más:** [Cloudflare: TryCloudflare](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)
