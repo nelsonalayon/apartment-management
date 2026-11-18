@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { verifyPin } from "@/lib/auth";
 import { getUserById, getUserPinHash } from "@/data/db";
 import { createSession, destroySession } from "@/lib/session";
+import { clearFailures, registerFailure, remainingLockMs } from "@/lib/rate-limit";
 
 /** Estado que la Server Action devuelve al formulario (useActionState). */
 export type LoginState = { error?: string };
@@ -23,14 +24,28 @@ export async function login(
     return { error: "Selecciona tu usuario e ingresa tu PIN." };
   }
 
+  // Fuerza bruta: si la clave ya está bloqueada, ni se verifica el PIN.
+  const lockMs = remainingLockMs(userId);
+  if (lockMs > 0) {
+    const minutes = Math.max(1, Math.ceil(lockMs / 60_000));
+    return {
+      error: `Demasiados intentos fallidos. Intenta de nuevo en ${minutes} min.`,
+    };
+  }
+
   const user = await getUserById(userId);
   const pinHash = user ? await getUserPinHash(user.id) : null;
 
   // Mensaje genérico a propósito: no revela si el usuario o el PIN existen.
   if (!user || !pinHash || !verifyPin(pin, pinHash)) {
+    const blocked = registerFailure(userId) > 0;
+    if (blocked) {
+      return { error: "Demasiados intentos fallidos. Intenta de nuevo en 5 min." };
+    }
     return { error: "Credenciales incorrectas." };
   }
 
+  clearFailures(userId);
   await createSession(user.id);
   redirect("/");
 }
