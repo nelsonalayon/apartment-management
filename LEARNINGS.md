@@ -126,7 +126,10 @@ PC, no con git (se recrea con un comando en una PC nueva).
 
 - **En el proyecto:** `scripts/start-public.ps1` es lo que la tarea ejecuta
   (Etapa A4: `pnpm start` + `tailscale funnel 3000`); la tarea se llama
-  `ElementalApp-Publica` y se ve en `taskschd.msc`.
+  `ElementalApp-Publica` y se ve en `taskschd.msc`. Sirve para arrancar
+  **cualquier ejecutable/script** (`.exe`, `.bat`, `.ps1`) a una hora o evento
+  (inicio de sesión, arranque, diario...); para varias cosas, agrúpalas en un
+  solo script. Disparadores útiles: `-AtLogOn`, `-AtStartup`, `-Daily -At 08:00`.
 - **Prueba:** `Get-ScheduledTask -TaskName "ElementalApp-Publica"` (estado) y
   `Start-ScheduledTask -TaskName "ElementalApp-Publica"` (lanzarla a mano).
 - **Ver más:** [Microsoft: Register-ScheduledTask](https://learn.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask)

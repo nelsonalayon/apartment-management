@@ -1,50 +1,52 @@
 # Memoria del proyecto
 
 ## Estado actual
-- MVP dashboard cuota inicial conectado a **MySQL real** (`sistema_propiedad`, Workbench) vía `mysql2` — sin API REST ni fallback a mock. Último commit: `da0e9ce` login de los 4 usuarios (pusheado a `origin/master`).
-- **Etapa A1 – app en internet** (18 nov 2026, Ruta A, sin tocar código): túnel **quick tunnel** de Cloudflare → URL `https://xxx.trycloudflare.com` (**efímera**, caduca ~2 h; **retirado**: cloudflared detenido, binario en `%LOCALAPPDATA%\cloudflared\` como respaldo). Verificado: E2E 15/15 + login del celular con datos móviles ✅.
-- **Etapa A3 – URL estable con Tailscale Funnel** (18 nov 2026, opción B gratis): Tailscale v1.104.7 + cuenta gratis + Funnel habilitado (aprobación web única). **URL única para siempre: `https://desktop-vt0tpeg.tail3c231e.ts.net`** → proxy a `127.0.0.1:3000`. Publicar (2 ventanas): `pnpm start` (o `pnpm dev`) + `"C:\Program Files\Tailscale\tailscale.exe" funnel 3000`. Tailscale arranca con Windows; el `funnel` hay que relanzarlo a mano (A4 lo automatizará). `next.config.ts` → `allowedDevOrigins` con ese hostname para que `pnpm dev` funcione vía túnel (solo dev; probado E2E 15/15 + asset 200). Verificado E2E 15/15 en prod y en dev + prueba del usuario en celular con datos móviles ✅.
-- **Etapa A4 – arranque automático** (18 nov 2026): tarea programada de Windows **`ElementalApp-Publica`** (al iniciar sesión **+1 min de espera** para esquivar la carga del boot, oculta, sin límite de tiempo, reintenta 3×) ejecuta `scripts/start-public.ps1` → libera puerto 3000, **espera a Tailscale (max 90s)**, lanza `tailscale funnel 3000` si no corre y arranca `pnpm start` con **salida a `%TEMP%\elemental-pnpm.log`**. Diagnóstico: pasos en `%TEMP%\elemental-start.log`. **Primer intento falló tras reinicio** (el script quedó colgado antes de arrancar pnpm: saturación del boot + salida a consola oculta); tras endurecerlo, verificado con tarea lanzada a mano: URL viva + E2E 15/15 ✅. **Pendiente: segundo reinicio real del PC** para confirmar, luego A5 (cierre).
-- **Etapa A2 – login endurecido** (18 nov 2026): rate limiting **en memoria** (5 intentos fallidos por usuario → bloqueo 5 min; durante el bloqueo ni el PIN correcto entra y no se emite cookie). `lib/rate-limit.ts` (puro, `now` inyectable) + 6 tests en `lib/rate-limit.test.ts`, conectado en `app/actions/auth.ts`. Clave = **userId** (no IP: un atacante rotando IPs no esquiva el límite). Cero dependencias, sin BD; un reinicio del server limpia los contadores. Verificado: 46/46 tests, build, lint, E2E 15/15 y prueba de fuerza bruta 7/7. **Pendiente: A4** (arranque auto), A5 cierre.
-- Datos al día hasta oct-2026 (10 nov 2026): 5 cuotas marcadas pagadas + 4 pagos insertados siguiendo la convención existente (fecha_pago = vencimiento, idperson = quien_debe_pagar, valor = valor_cuota); el pago 36 quedó consistente con su cuota 77. Backup previo en `backups/` (gitignored).
-- Tests Vitest: **40/40** (`pnpm test`) — cálculos (incl. extras), formato, integridad de fixtures (incl. `codigo` corto) y auth (`lib/auth.test.ts`).
-- Login de los 4 usuarios (14 nov 2026, commit `da0e9ce`): PIN de 4 dígitos con hash **scrypt** en `persona.pin_hash` (columna nueva; `scripts/set-pins.mts` la crea y asigna PINs, `--reset` regenera — los PINs solo se imprimen una vez). Verificado E2E HTTP: 15/15 (login, logout, protección de rutas, cookie segura). Regla 4 de AGENTS.md admite E2E HTTP como alternativa al MCP de DevTools.
-- Códigos cortos (11 nov 2026): badge/filtros muestran **"Apto 101"/"Apto 202"** (no la referencia larga). Campo `codigo` en `Apartment`, derivado en `data/db.ts` (`CODIGOS_CORTOS` por nombre); `id`/`apartmentId` siguen siendo la referencia larga (clave de unión).
-- `LEARNINGS.md`: plantilla "enseñable" en español (título-pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales verificados).
-- Modo oscuro: 3 estados con `next-themes`, default **oscuro**, botón en Header. `formatCOP` corrige el NBSP de Intl → "$75.000.000".
-- Rediseño visual (11 nov 2026, skill `frontend-design`): hero con avance general (`text-6xl`) + franja hairline de stats; Geist como única `--font-sans` (Inter eliminado); `lang="es"`; sin sombras; badge "Datos reales"; `motion-reduce` en barras y skeleton.
-- **Metodología de tareas complejas** (17 nov 2026, en `AGENTS.md`): escala **1-10 con tope 10**; división en etapas obligatoria desde **6**; **10 = ALERTA** (descomponer en tareas pequeñas e independientes antes de empezar);5 criterios de división y ejecución etapa a etapa (verificar → aprobación → commit).
+- MVP dashboard cuota inicial conectado a **MySQL real** (`sistema_propiedad`, Workbench) vía `mysql2` — sin API REST ni fallback a mock.
+- **Ruta A completada (A1-A5, 18-19 nov 2026): la app está en internet** con URL estable `https://desktop-vt0tpeg.tail3c231e.ts.net` y **arranque automático** (tarea Windows `ElementalApp-Publica`). Guía de operación en `README.md`. Verificado: 46/46 tests, build, lint, E2E 15/15 y pruebas del usuario en celular con datos móviles ✅.
+- Datos al día hasta oct-2026 (10 nov 2026): 5 cuotas pagadas + 4 pagos con la convención existente (fecha_pago = vencimiento, idperson = quien_debe_pagar, valor = valor_cuota); backup previo en `backups/` (gitignored).
+- Tests Vitest: **46/46** — cálculos (incl. extras), formato, integridad de fixtures, auth y rate limiting.
+- Login de los 4 usuarios: PIN de 4 dígitos con hash **scrypt** en `persona.pin_hash` (`scripts/set-pins.mts`, `--reset` regenera; PINs solo se imprimen una vez). Regla 4 de AGENTS.md admite E2E HTTP como alternativa al MCP de DevTools.
+- Códigos cortos: badge/filtros muestran **"Apto 101"/"Apto 202"**; `codigo` en `Apartment` (derivado en `data/db.ts`); `id`/`apartmentId` siguen siendo la referencia larga.
+- `LEARNINGS.md` con plantilla en español (pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales).
+- Modo oscuro: 3 estados con `next-themes`, default **oscuro**. `formatCOP` corrige el NBSP de Intl → "$75.000.000". Rediseño (11 nov): Geist única `--font-sans`, `lang="es"`, sin sombras, `motion-reduce`.
+- **Metodología** (en `AGENTS.md`): escala 1-10 con tope 10; divisiones en etapas obligatorias desde 6; 10 = ALERTA; ejecución etapa a etapa (verificar → aprobación → commit).
+
+## Ruta A — resumen de etapas (18-19 nov 2026)
+- **A1 – app en internet:** quick tunnel de Cloudflare (efímero, caduca ~2 h) → **retirado**; binario en `%LOCALAPPDATA%\cloudflared\` como respaldo. E2E 15/15 + celular ✅.
+- **A2 – login endurecido:** `lib/rate-limit.ts` (puro) → 5 fallos por usuario = bloqueo 5 min; durante el bloqueo ni el PIN correcto entra. Clave = userId (no IP). 6 tests; fuerza bruta 7/7 ✅.
+- **A3 – URL estable:** **Tailscale Funnel** (gratis, `*.ts.net`), elegido sobre dominio propio Cloudflare (~$10-12/año, queda como mejora futura). `next.config.ts` → `allowedDevOrigins` (solo dev). E2E 15/15 en prod y dev ✅.
+- **A4 – arranque automático:** tarea `ElementalApp-Publica` (inicio de sesión +1 min, oculta, 3 reintentos) → `scripts/start-public.ps1`: libera puerto 3000, espera a Tailscale ≤90 s, `tailscale funnel 3000`, `pnpm start` con salida a `%TEMP%`. **Reinicio real del PC verificado ✅** (19 nov).
+- **A5 – cierre documental:** MEMORY consolidado, guía de operación en `README.md`, LEARNINGS al día.
+
+## Operación rápida (detalle en README)
+- Tras iniciar sesión, la web sola vuelve en ~1 min; la URL **nunca cambia**.
+- Parar: matar puerto 3000 + proceso `tailscale.exe funnel`. Relanzar: `Start-ScheduledTask -TaskName "ElementalApp-Publica"`.
+- No levanta → `%TEMP%\elemental-start.log` (pasos) y `%TEMP%\elemental-pnpm.log` (errores).
 
 ## Decisiones importantes (y por qué)
-- **Datos:** `data/db.ts` (pool mysql2 + 4 queries) es la única fuente en runtime; `data/mock-data.ts` queda solo como fixture de tests. Los componentes no se tocaron (mismos tipos `lib/types.ts`).
-- **`pagos_adicionales` SÍ cuentan** en el avance (decisión del usuario, con tope existente: avance ≤100%, pendiente ≥0). Extras también en `UserSummary.totalPagado` para que suma usuarios = total general. → toca `getApartmentSummary/getUserSummary/getGeneralSummary` con param `extras`.
+- **Datos:** `data/db.ts` (pool mysql2 + 4 queries) es la única fuente en runtime; `data/mock-data.ts` solo como fixture de tests. Componentes intactos (mismos tipos `lib/types.ts`).
+- **`pagos_adicionales` SÍ cuentan** en el avance (decisión del usuario; tope: avance ≤100%, pendiente ≥0). Extras también en `UserSummary.totalPagado` → `getApartmentSummary/getUserSummary/getGeneralSummary` con param `extras`.
 - **`estado='vencida'` → se muestra `pendiente`** (0 filas hoy; anotado en `data/db.ts`).
-- **Next 16 Cache Components:** datos frescos por request → `DashboardContent` async detrás de `<Suspense>` + streaming. NO `'use cache'`, NO prerender con BD en build. Leído de `node_modules/next/dist/docs/` (06-fetching-data, 08-caching).
-- **`dateStrings: true`** → fechas "YYYY-MM-DD" directas para `lib/format.ts`.
-- `mysql2` es la 1ª excepción justificada a "sin dependencias" (junto a `next-themes`).
-- **Rediseño sin dependencias nuevas:** Geist ya estaba importada en `layout.tsx` (solo se rewiró a `--font-sans`); semántica de color constante: emerald = pagado, ámbar = pendiente (siempre con variante `dark:`).
-- **Archivos de agentes:** subir solo los propios (`opencode.json`, `.opencode/`, `skills-lock.json`, `.agents/skills/local-dates`); ignorar skills de terceros y sus copias (`.claude/`, `.aider-desk/`...) — regenerables con el instalador.
-- **Login sin dependencias nuevas:** Server Actions (no Route Handlers → sigue "sin API REST") + cookie firmada HMAC-SHA256, httpOnly/SameSite=lax/30 días; `SESSION_SECRET` solo en `.env.local`. La BD almacena hashes (scrypt+salt), nunca PINs en claro; errores de credenciales genéricos.
-- **Internet vía túnel desde el PC (Ruta A)** elegida sobre nube/Vercel: gratis, sin migrar MySQL, etapas pequeñas; contra: el PC debe estar encendido. A3 eligió **Tailscale Funnel** (gratis, URL estable `*.ts.net`) sobre dominio propio Cloudflare (~$10-12/año) — este queda como mejora futura si algún día se quiere URL bonita o el PIN-por-correo (Cloudflare Access; el `--allowed-mail` del quick tunnel no viaja a Tailscale). **Cero config en el repo** salvo `allowedDevOrigins` (solo dev). Nunca commitear correos/tokens.
+- **Next 16 Cache Components:** datos frescos por request → `DashboardContent` async detrás de `<Suspense>`; NO `'use cache'`, NO prerender con BD en build (`node_modules/next/dist/docs/`).
+- **`dateStrings: true`** → fechas "YYYY-MM-DD" directas para `lib/format.ts`. `mysql2` y `next-themes` = únicas excepciones a "sin dependencias".
+- **Login:** Server Actions (sigue "sin API REST") + cookie HMAC-SHA256 httpOnly/SameSite=lax/30 días; `SESSION_SECRET` solo en `.env.local`; hashes scrypt en BD, errores genéricos.
+- **Internet = Ruta A (túnel desde el PC):** gratis, sin migrar MySQL; contra: el PC debe estar encendido. **Tailscale Funnel** por URL estable gratis; dominio propio queda como mejora futura (habilitaría Cloudflare Access = PIN por correo). Cero config en el repo salvo `allowedDevOrigins` (solo dev).
+- **Tarea programada en Windows, script en git:** si cambia la PC, el script viaja con el repo y la tarea se recrea con `Register-ScheduledTask` (entrada en `LEARNINGS.md`). Nunca commitear correos/tokens/PINs.
+- **Archivos de agentes:** subir solo los propios (`opencode.json`, `.opencode/`, `skills-lock.json`, `.agents/skills/local-dates`).
 
 ## Errores a evitar
-- **PowerShell `node -e` rompe las comillas del SQL** → escribir `scripts/*.mjs` y correr `node scripts/x.mjs` (hay `scripts/db-diagnostic.mjs`).
-- En `cuotas` la columna es **`valor_cuota`** (no `valor`).
-- **`pool.query<T>` de mysql2 exige `T extends QueryResult`** → los tipos de fila deben `extends RowDataPacket` (si no, falla el build con TS2344).
-- `.env.local` (credenciales) NUNCA a git ni a AGENTS.md/MEMORY.md/LEARNINGS.md.
-- Hidratación: `<html>` necesita `suppressHydrationWarning`; en el toggle, todo lo que depende del tema espera a `montado` (`useSyncExternalStore`, no `useState`+effect → `react-hooks/set-state-in-effect`).
-- Asumir formato de Intl sin probar: es-CO da NBSP en "$" y fecha "15 de ene de 2026".
-- Matar el puerto 3000 antes de `pnpm build`. El bloque `nextjs-agent-rules` lo re-escribe `next dev`: no quitarlo del diff.
-- **Cache Components + auth:** `cookies()` fuera de `<Suspense>` = error de build; `Date.now()` en la cadena de sesión = "unstable value" → `await connection()` en `getCurrentUser()`; bug known de Next (`InvariantError` de cookies al re-renderizar Server Actions en rutas PPR) → try/catch tratando como "sin sesión".
-- **Server Actions por fetch propio: solo `multipart/form-data`** — con `application/x-www-form-urlencoded` el action NO se ejecuta (devuelve la página sin ejecutar nada).
-- Reinicios del server/harness pueden corromper archivos recién escritos (UTF-16/nulos): verificar integridad tras un reinicio.
-- **`<select>` nativo en tema oscuro:** sin colores explícitos en `<option>` (fondo transparente + texto heredado blanco) el popup lo pinta el navegador con fondo claro → nombres invisibles hasta el hover (pasó en Edge). Fix: `bg-popover text-popover-foreground` en cada `<option>`; el `color-scheme: dark` solo no basta.
-- El MCP `chorme-devtools` (typo en `opencode.json`) puede no estar conectado: sus herramientas solo aparecen si la sesión arranca en la carpeta del proyecto — comprobar con `/mcp` o reiniciar; mientras, la regla 4 permite E2E HTTP.
-- **`pnpm start` falla con `EADDRINUSE :::3000`:** proceso `node` huérfano (reinicios cancelan la terminal pero no al proceso) que puede quedar **colgado escuchando sin responder** → `Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }` y relanzar.
-- **`cloudflared` dispara el firewall de Windows** la primera vez → permitir solo en **Redes privadas** (la red de casa es perfil Privada); no marcar públicas.
-- **No correr `pnpm build` mientras `next start` sirve la web pública:** reescribe `.next` en caliente. Primero parar el servidor (matar puerto 3000), build, y relanzar server + túnel (la URL cambiará).
-- **El quick tunnel de Cloudflare caduca (~2 h):** el server empieza a loguear `ERR Register tunnel error ... Unauthorized: Tunnel not found` y la URL vieja deja de servir → matar `cloudflared.exe` y relanzar (URL nueva). Solución de fondo: A3 (URL estable).
-- **Un proceso lanzado en background con `timeout` muere al agotarlo** (pasó con `tailscale funnel 3000` a los 30 min → la app dejó de cargar en el celular): lanzar los servicios de larga duración **sin timeout** y, si hace falta, reiniciarlos al notificar su muerte.
-- `⚠ Missing origin header from a forwarded Server Actions request` en el log del server = los scripts E2E (fetch/curl) no envían cabecera `Origin`; es un aviso benigno, no un fallo.
-- **Para parar la app pública:** matar el puerto 3000 + el proceso `tailscale.exe` con `funnel` en la línea de comandos; la tarea `ElementalApp-Publica` no se autodetiene (relanzarla con `Start-ScheduledTask`). Un `Get-ScheduledTask ... .State = Running` es normal mientras la app sirve.
-- **Tarea programada arrancando la app tras reinicio:** si no levanta, mirar `%TEMP%\elemental-start.log` (pasos) y `%TEMP%\elemental-pnpm.log` (errores de next). Causa encontrada: con la salida de pnpm a consola oculta el script podía colgar en el boot → redirigir a archivo + delay de 1 min en el trigger + esperar a Tailscale antes del funnel.
+- PowerShell `node -e` rompe las comillas del SQL → `scripts/*.mjs` con `node scripts/x.mjs`.
+- En `cuotas` la columna es **`valor_cuota`** (no `valor`). `pool.query<T>` exige `T extends QueryResult` (si no, TS2344 en build).
+- `.env.local` NUNCA a git ni a AGENTS/MEMORY/LEARNINGS.
+- Hidratación: `<html>` necesita `suppressHydrationWarning`; en el toggle, esperar a `montado` (`useSyncExternalStore`, no `useState`+effect).
+- asumir formato de Intl sin probar (es-CO: NBSP en "$" y "15 de ene de 2026").
+- Matar el puerto 3000 antes de `pnpm build`; **nunca `pnpm build` con `next start` sirviendo** (reescribe `.next` en caliente). Bloque `nextjs-agent-rules`: no quitarlo del diff.
+- **Cache Components + auth:** `cookies()` fuera de `<Suspense>` = error de build; `Date.now()` en sesión = "unstable value" → `await connection()`; `InvariantError` de cookies en PPR → try/catch como "sin sesión".
+- **Server Actions por fetch propio: solo `multipart/form-data`** (con urlencoded no se ejecuta).
+- Reinicios del harness pueden corromper archivos recién escritos (UTF-16/nulos): verificar integridad.
+- **`<select>` nativo en oscuro:** `<option>` necesita `bg-popover text-popover-foreground` (el `color-scheme: dark` no basta).
+- MCP `chorme-devtools` (typo en `opencode.json`) puede no estar conectado → `/mcp` o reiniciar; mientras, regla 4 (E2E HTTP).
+- **`EADDRINUSE :::3000`:** proceso node huérfano → `Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`.
+- **Proceso en background con `timeout` muere al agotarlo** (mató el funnel a los 30 min): servicios de larga duración **sin timeout**.
+- `⚠ Missing origin header ...` en logs = scripts E2E sin cabecera `Origin`; aviso benigno.
+- **Tarea no levanta tras reinicio:** mirar `%TEMP%\elemental-start.log` y `elemental-pnpm.log`. Causa ya vista: salida de pnpm a consola oculta se colgaba en el boot → redirigir a archivo + delay 1 min + esperar a Tailscale.

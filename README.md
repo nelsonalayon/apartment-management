@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Proyecto Elemental — control de cuota inicial
 
-## Getting Started
+MVP para controlar el pago de la cuota inicial de dos apartamentos (101 y 202),
+con login por PIN para 4 usuarios. Next.js 16 + MySQL local (`sistema_propiedad`).
 
-First, run the development server:
+**App en internet:** <https://desktop-vt0tpeg.tail3c231e.ts.net>
+(URL estable; el PC debe estar encendido y con sesión iniciada).
+
+## Desarrollo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev      # desarrollo → http://localhost:3000
+pnpm test     # tests (Vitest)
+pnpm build    # build de producción (matar el puerto 3000 antes)
+pnpm lint     # ESLint
+pnpm start    # sirve el build de producción
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Credenciales y `SESSION_SECRET` solo en `.env.local` (nunca en git).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Operación (app pública)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Arranque automático
+Al iniciar sesión en Windows, la tarea programada **`ElementalApp-Publica`**
+(`Win + R` → `taskschd.msc`) ejecuta `scripts/start-public.ps1`, que:
 
-## Learn More
+1. libera el puerto 3000 (procesos `node` huérfanos),
+2. espera a que Tailscale esté listo (≤90 s) y lanza `tailscale funnel 3000`,
+3. arranca `pnpm start` (producción).
 
-To learn more about Next.js, take a look at the following resources:
+No hay que hacer nada: ~1 min tras iniciar sesión la URL está viva.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Publicar a mano (sin tarea)
+```powershell
+pnpm start
+& "C:\Program Files\Tailscale\tailscale.exe" funnel 3000
+```
+La URL nunca cambia: `https://desktop-vt0tpeg.tail3c231e.ts.net`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Parar la web
+```powershell
+Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+Get-CimInstance Win32_Process -Filter "Name = 'tailscale.exe'" |
+  Where-Object { $_.CommandLine -like "*funnel*" } |
+  ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+```
+Para volver a levantarla: `Start-ScheduledTask -TaskName "ElementalApp-Publica"`.
 
-## Deploy on Vercel
+### Si algo falla
+| Síntoma | Qué mirar |
+|---|---|
+| No carga tras reiniciar el PC | `%TEMP%\elemental-start.log` (pasos del script) y `%TEMP%\elemental-pnpm.log` (errores de Next) |
+| `EADDRINUSE` al ejecutar `pnpm start` | proceso `node` huérfano en el 3000 → matarlo (comando arriba) |
+| 502/000 con la tarea en `Running` | no hay `node` en el 3000 → ver `elemental-pnpm.log` |
+| "Demasiados intentos fallidos" | bloqueo de seguridad (5 PINs malos = 5 min); esperar o reiniciar el server |
+| La tarea no existe (PC nueva) | recrearla con `Register-ScheduledTask` → ver `scripts/start-public.ps1` y `LEARNINGS.md` |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Requisitos
+- PC encendido con sesión iniciada (la tarea corre al logón).
+- Servicio **Tailscale** (arranca con Windows) y **MySQL80** activos.
+- El script `scripts/start-public.ps1` tiene rutas absolutas: si la carpeta del
+  proyecto cambia, actualizarlas.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Documentación del proyecto
+- `AGENTS.md` — reglas de código y metodología de tareas complejas.
+- `MEMORY.md` — estado actual, decisiones y errores a evitar.
+- `LEARNINGS.md` — respuestas cortas a preguntas de código/conceptos.
