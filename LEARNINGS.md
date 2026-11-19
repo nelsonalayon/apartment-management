@@ -114,3 +114,20 @@ visual.
   `location: /login` (o el meta refresh del streaming en rutas con `<Suspense>`).
 - **Ver más:** [Playwright: end-to-end testing](https://playwright.dev/docs/intro)
   · [MDN: HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP)
+
+## ¿Cómo se crea una tarea programada y dónde se guarda?
+
+**Por qué importa:** una tarea programada es el "cron" de Windows: defines
+*qué ejecutar* (Action), *cuándo* (Trigger, ej: al iniciar sesión con delay) y
+*cómo* (Settings, ej: sin límite de tiempo), y lo registras con
+`Register-ScheduledTask`. Windows la guarda como **XML en
+`C:\Windows\System32\Tasks\<nombre>`** — fuera del repo, así que viaja con la
+PC, no con git (se recrea con un comando en una PC nueva).
+
+- **En el proyecto:** `scripts/start-public.ps1` es lo que la tarea ejecuta
+  (Etapa A4: `pnpm start` + `tailscale funnel 3000`); la tarea se llama
+  `ElementalApp-Publica` y se ve en `taskschd.msc`.
+- **Prueba:** `Get-ScheduledTask -TaskName "ElementalApp-Publica"` (estado) y
+  `Start-ScheduledTask -TaskName "ElementalApp-Publica"` (lanzarla a mano).
+- **Ver más:** [Microsoft: Register-ScheduledTask](https://learn.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask)
+  · [Microsoft: schtasks create](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks-create)
