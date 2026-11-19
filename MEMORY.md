@@ -6,10 +6,10 @@
 - Datos al día hasta oct-2026 (10 nov 2026): 5 cuotas pagadas + 4 pagos con la convención existente (fecha_pago = vencimiento, idperson = quien_debe_pagar, valor = valor_cuota); backup previo en `backups/` (gitignored).
 - Tests Vitest: **46/46** — cálculos (incl. extras), formato, integridad de fixtures, auth y rate limiting.
 - Login de los 4 usuarios: PIN de 4 dígitos con hash **scrypt** en `persona.pin_hash` (`scripts/set-pins.mts`, `--reset` regenera; PINs solo se imprimen una vez). Regla 4 de AGENTS.md admite E2E HTTP como alternativa al MCP de DevTools.
-- Códigos cortos: badge/filtros muestran **"Apto 101"/"Apto 202"**; `codigo` en `Apartment` (derivado en `data/db.ts`); `id`/`apartmentId` siguen siendo la referencia larga.
-- `LEARNINGS.md` con plantilla en español (pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más" con enlaces oficiales).
+- Códigos cortos: badge/filtros muestran **"Apto 101"/"Apto 202"** (`codigo` derivado en `data/db.ts`; `id`/`apartmentId` siguen siendo la referencia larga). `LEARNINGS.md` con plantilla en español (pregunta + "Por qué pasa" + "En el proyecto" + "Prueba" + "Ver más").
 - Modo oscuro: 3 estados con `next-themes`, default **oscuro**. `formatCOP` corrige el NBSP de Intl → "$75.000.000". Rediseño (11 nov): Geist única `--font-sans`, `lang="es"`, sin sombras, `motion-reduce`.
 - **Metodología** (en `AGENTS.md`): escala 1-10 con tope 10; divisiones en etapas obligatorias desde 6; 10 = ALERTA; ejecución etapa a etapa (verificar → aprobación → commit).
+- **Constitución** (`docs/CONSTITUTION.md`, 19 nov): 6 principios innegociables con su verificación (stack simple, spec>código, lógica/interfaz, tests>dependencias, datos protegidos, idioma); `docs/` trackeado en git (`fd5fdea`). Verificación principio 6: acentos = 0 en identificadores/nombres de archivo (en comentarios/textos sí, van en español).
 
 ## Ruta A — resumen de etapas (18-19 nov 2026)
 - **A1 – app en internet:** quick tunnel de Cloudflare (efímero, caduca ~2 h) → **retirado**; binario en `%LOCALAPPDATA%\cloudflared\` como respaldo. E2E 15/15 + celular ✅.
