@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   getApartmentSummary,
   getGeneralSummary,
+  getUserApartmentSummary,
   getUserSummary,
 } from "@/lib/calculations";
+import { buildPaymentRows } from "@/lib/installments";
 import { apartments, installments, users } from "@/data/mock-data";
 import type { Apartment, ExtraPayment, Installment } from "@/lib/types";
 
@@ -140,6 +142,19 @@ describe("límites de avance", () => {
 
     expect(s.avance).toBe(0);
   });
+
+  it("avance exacto al 100% → pendiente 0 (caso 6)", () => {
+    // Pagado justo = cuota inicial (500.000), sin pasarse
+    const cuotas: Installment[] = [
+      { id: "c1", numero: 1, apartmentId: "x", valor: 500_000, fechaLimite: "2026-01-01", estado: "pagada", userId: "ana", fechaPago: "2026-01-01" },
+    ];
+
+    const s = getApartmentSummary(fakeApartment, cuotas);
+
+    expect(s.valorPagado).toBe(500_000);
+    expect(s.avance).toBe(100);
+    expect(s.valorPendiente).toBe(0);
+  });
 });
 
 describe("pagos adicionales (extras)", () => {
@@ -223,5 +238,123 @@ describe("pagos adicionales (extras)", () => {
     );
 
     expect(totalUsuarios).toBe(getGeneralSummary(apartments, installments, extras).totalPagado);
+  });
+});
+
+describe("getUserApartmentSummary", () => {
+  const ana = users.find((u) => u.id === "ana")!;
+  const carlos = users.find((u) => u.id === "carlos")!;
+  const andres = users.find((u) => u.id === "andres")!;
+
+  it("suma solo los pagos del apartamento indicado (caso 5)", () => {
+    const en101 = getUserApartmentSummary(ana, apto101!, installments, extras);
+    const en202 = getUserApartmentSummary(ana, apto202!, installments, extras);
+
+    // 101: cuotas 1 y 3 (6.000.000) + extra e1 (1.000.000)
+    expect(en101.cuotasPagadas).toBe(2);
+    expect(en101.totalPagado).toBe(7_000_000);
+    // 202: solo su cuota 3 (3.500.000); nada del 101 se mezcla
+    expect(en202.cuotasPagadas).toBe(1);
+    expect(en202.totalPagado).toBe(3_500_000);
+  });
+
+  it("usuario solo con extras en el apartamento → tienePagos true (CA-7.1)", () => {
+    // Carlos no tiene cuotas pagadas en el 202, solo el extra e2
+    const en202 = getUserApartmentSummary(carlos, apto202!, installments, extras);
+
+    expect(en202.cuotasPagadas).toBe(0);
+    expect(en202.totalPagado).toBe(500_000);
+    expect(en202.tienePagos).toBe(true);
+  });
+
+  it("sin pagos en el apartamento → tienePagos false (caso 13)", () => {
+    // Andrés no pagó nada en el 101 (ni cuotas ni extras)
+    const andresEn101 = getUserApartmentSummary(andres, apto101!, installments, extras);
+    expect(andresEn101.cuotasPagadas).toBe(0);
+    expect(andresEn101.totalPagado).toBe(0);
+    expect(andresEn101.tienePagos).toBe(false);
+
+    // ...pero sí tiene pago en el 202 (su cuota 2)
+    const andresEn202 = getUserApartmentSummary(andres, apto202!, installments, extras);
+    expect(andresEn202.tienePagos).toBe(true);
+    expect(andresEn202.totalPagado).toBe(3_500_000);
+  });
+});
+
+describe("estados vacíos (defensa, RF-10)", () => {
+  const aptoVacio: Apartment = {
+    id: "vacio",
+    codigo: "vacio",
+    nombre: "Apartamento vacío",
+    valorTotal: 1_000_000,
+    cuotaInicial: 1_000_000,
+  };
+
+  it("apartamento sin ningún pago → resumen en 0, avance 0 (caso 13)", () => {
+    const s = getApartmentSummary(aptoVacio, [], []);
+
+    expect(s.totalCuotas).toBe(0);
+    expect(s.cuotasPagadas).toBe(0);
+    expect(s.valorPagado).toBe(0);
+    expect(s.valorPendiente).toBe(1_000_000); // todo sigue pendiente
+    expect(s.avance).toBe(0);
+  });
+
+  it("sin cuotas pero con extras → avance > 0 (caso 12)", () => {
+    const extrasVacio: ExtraPayment[] = [
+      { id: "ev1", apartmentId: "vacio", monto: 100_000, concepto: "separación", fecha: "2026-01-10", userId: "ana" },
+    ];
+    const s = getApartmentSummary(aptoVacio, [], extrasVacio);
+
+    expect(s.totalCuotas).toBe(0); // "sin cuotas registradas"
+    expect(s.valorPagado).toBe(100_000);
+    expect(s.valorPendiente).toBe(900_000);
+    expect(s.avance).toBe(10); // 100.000 / 1.000.000 × 100
+  });
+});
+
+describe("flujo de la página del apartamento", () => {
+  // Reproduce el orden de la página: alcance → resumen → filas → usuarios.
+
+  it("el código exacto 101/202 se encuentra; direcciones inválidas no (RF-9)", () => {
+    const buscar = (codigo: string) => apartments.find((a) => a.codigo === codigo);
+
+    expect(buscar("101")).toBeDefined();
+    expect(buscar("202")).toBeDefined();
+    expect(buscar("101 ")).toBeUndefined(); // espacio sobrante
+    expect(buscar("")).toBeUndefined(); // vacío
+    expect(buscar("303")).toBeUndefined(); // no existe
+    expect(buscar("abc")).toBeUndefined(); // letras
+  });
+
+  it("101: resumen, filas (extras arriba) y lista de usuarios", () => {
+    const apto = apartments.find((a) => a.codigo === "101")!;
+    const extras101 = extras.filter((e) => e.apartmentId === apto.id);
+    const cuotas101 = installments.filter((c) => c.apartmentId === apto.id);
+
+    // 1) Resumen (RF-5): 16.000.000 pagados (15.000.000 cuotas + 1.000.000 extra)
+    const resumen = getApartmentSummary(apto, installments, extras101);
+    expect(resumen.valorPagado).toBe(16_000_000);
+    expect(resumen.valorPendiente).toBe(20_000_000);
+    expect(resumen.avance).toBeCloseTo(44.44, 1);
+
+    // 2) Filas (RF-6/RF-8): el extra e1 primero, luego las 12 cuotas 1..12
+    const filas = buildPaymentRows(cuotas101, extras101);
+    expect(filas).toHaveLength(13);
+    expect(filas[0]).toMatchObject({ tipo: "extra", id: "e1" });
+    expect(
+      filas.slice(1).map((fila) => (fila.tipo === "cuota" ? fila.numero : -1))
+    ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+
+    // 3) Usuarios (RF-7): ana, carlos y laura; Andrés no pagó nada en el 101
+    const usuarios = users
+      .map((user) => getUserApartmentSummary(user, apto, installments, extras101))
+      .filter((s) => s.tienePagos);
+
+    expect(usuarios.map((s) => s.user.id)).toEqual(["ana", "carlos", "laura"]);
+
+    // 4) La suma de lo pagado por cada usuario = valorPagado del resumen
+    const sumaUsuarios = usuarios.reduce((total, s) => total + s.totalPagado, 0);
+    expect(sumaUsuarios).toBe(resumen.valorPagado); // 7M + 6M + 3M = 16M
   });
 });

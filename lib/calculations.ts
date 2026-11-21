@@ -120,6 +120,53 @@ export function getUserSummary(
 }
 
 /**
+ * Resumen de un usuario dentro de UN apartamento (página del
+ * apartamento): suma solo sus cuotas pagadas y sus pagos adicionales
+ * de ese apartamento. Si solo tiene extras, también aparece.
+ */
+export type UserApartmentSummary = {
+  user: User;
+  /** Cuotas pagadas por este usuario en este apartamento. */
+  cuotasPagadas: number;
+  /** Total pagado en este apartamento: sus cuotas + sus extras. */
+  totalPagado: number;
+  /** true si tiene al menos un pago (cuota o extra) en este apartamento. */
+  tienePagos: boolean;
+};
+
+/**
+ * Calcula lo que un usuario ha pagado en un apartamento concreto.
+ * Nunca mezcla montos de otro apartamento (spec RF-4/CA-4.2).
+ */
+export function getUserApartmentSummary(
+  user: User,
+  apartment: Apartment,
+  installments: Installment[],
+  extras: ExtraPayment[]
+): UserApartmentSummary {
+  const pagadas = installments.filter(
+    (cuota) =>
+      cuota.apartmentId === apartment.id &&
+      cuota.estado === "pagada" &&
+      cuota.userId === user.id
+  );
+  const extrasDelUsuario = extras.filter(
+    (extra) => extra.apartmentId === apartment.id && extra.userId === user.id
+  );
+
+  const totalPagado =
+    pagadas.reduce((total, cuota) => total + cuota.valor, 0) +
+    extrasDelUsuario.reduce((total, extra) => total + extra.monto, 0);
+
+  return {
+    user,
+    cuotasPagadas: pagadas.length,
+    totalPagado,
+    tienePagos: pagadas.length > 0 || extrasDelUsuario.length > 0,
+  };
+}
+
+/**
  * Calcula el resumen general de todos los apartamentos, cuotas
  * y pagos adicionales.
  */
