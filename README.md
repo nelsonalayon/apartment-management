@@ -25,10 +25,14 @@ Al iniciar sesión en Windows, la tarea programada **`ElementalApp-Publica`**
 (`Win + R` → `taskschd.msc`) ejecuta `scripts/start-public.ps1`, que:
 
 1. libera el puerto 3000 (procesos `node` huérfanos),
-2. espera a que Tailscale esté listo (≤90 s) y lanza `tailscale funnel 3000`,
-3. arranca `pnpm start` (producción).
+2. espera a que Tailscale esté en estado `Running` (≤90 s); si no llega,
+   abre su GUI (`tailscale-ipn.exe`) para destrabarlo y vuelve a esperar (≤60 s),
+3. lanza `tailscale funnel 3000` si no está corriendo y programa un **sondeo**
+   que escribe `PASS`/`FAIL` en el log (primero `localhost:3000`, luego la URL pública),
+4. arranca `pnpm start` (producción).
 
 No hay que hacer nada: ~1 min tras iniciar sesión la URL está viva.
+Para comprobarlo, busca `PASS`/`FAIL` en `%TEMP%\elemental-start.log`.
 
 ### Publicar a mano (sin tarea)
 ```powershell
@@ -51,6 +55,7 @@ Para volver a levantarla: `Start-ScheduledTask -TaskName "ElementalApp-Publica"`
 | Síntoma | Qué mirar |
 |---|---|
 | No carga tras reiniciar el PC | `%TEMP%\elemental-start.log` (pasos del script) y `%TEMP%\elemental-pnpm.log` (errores de Next) |
+| Local OK pero la URL pública no responde | busca `FAIL - URL publica` en el log → Tailscale atorado en `NoState`; el script ya intenta abrir su GUI solo, si no basta: abrir `tailscale-ipn.exe` a mano y relanzar la tarea |
 | `EADDRINUSE` al ejecutar `pnpm start` | proceso `node` huérfano en el 3000 → matarlo (comando arriba) |
 | 502/000 con la tarea en `Running` | no hay `node` en el 3000 → ver `elemental-pnpm.log` |
 | "Demasiados intentos fallidos" | bloqueo de seguridad (5 PINs malos = 5 min); esperar o reiniciar el server |
