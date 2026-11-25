@@ -29,6 +29,10 @@ interface ApartmentRow extends RowDataPacket {
   nombre: string;
   valorTotal: number;
   cuotaInicial: number;
+  /** Enlace de consignación del negocio (columna `link_consignacion`). */
+  linkConsignacion: string | null;
+  /** Número del inmueble (columna `numeroInmueble` de la BD). */
+  numeroInmueble: number | null;
 }
 
 /** Fila de la tabla `persona`. */
@@ -80,13 +84,17 @@ export async function getApartments(): Promise<Apartment[]> {
     `SELECT referenciaApto AS id,
             nombre_apartamento AS nombre,
             COALESCE(Valor_apartamento, 0) AS valorTotal,
-            COALESCE(cuota_inicial, 0) AS cuotaInicial
+            COALESCE(cuota_inicial, 0) AS cuotaInicial,
+            apartamento.link_consignacion AS linkConsignacion,
+            apartamento.numeroInmueble
      FROM apartamento
      ORDER BY nombre_apartamento`
   );
   return rows.map((row) => ({
     ...row,
     codigo: CODIGOS_CORTOS[row.nombre] ?? row.nombre,
+    linkConsignacion: row.linkConsignacion ?? undefined,
+    numeroInmueble: row.numeroInmueble ?? undefined,
   }));
 }
 

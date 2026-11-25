@@ -93,6 +93,10 @@ login completo = 9 · publicar en internet = 9 · migrar la BD a la nube = 10
 - Tras una pregunta de código/conceptos (stack, git, herramientas), añade una entrada breve en `LEARNINGS.md` automáticamente **siguiendo su plantilla** (título-pregunta, respuesta corta, "En el proyecto", "Prueba" y "Ver más" con enlaces oficiales verificados; contenido en español). No guardes preguntas ajenas al código (OpenCode, logística, conversación).
 - No guardes nunca datos sensibles (Claves, tokens, datos personales...)
 
+## Reglas
+
+- Lee `docs/constitution.md` y la spec activa (`specs/NNN-*/`) antes de tocar código.
+
 ## Limites
 
 - Siempre: Actualizar `MEMORY.md` al terminar cada tarea.
@@ -107,8 +111,6 @@ Orden obligatorio al terminar cada tarea:
 4. Verifica la funcionalidad con el MCP de Chrome DevTools si está disponible (verifica en `opencode.json` que la sesión arranque en la carpeta del proyecto); si no lo está, con una **verificación E2E por HTTP** (script temporal fuera del repo: redirects, acciones, cookies y HTML de respuesta) más la revisión de la consola del dev server. En ambos casos: prueba la funcionalidad y comprueba la vista móvil.
 
 Si algo falla, corrige antes de terminar. Los tests viven junto a lo que prueban (`lib/*.test.ts`, `data/*.test.ts`); si cambias una regla de cálculo o formato, actualiza o añade el test que la cubra.
-
-
 
 
 <!-- BEGIN:nextjs-agent-rules -->

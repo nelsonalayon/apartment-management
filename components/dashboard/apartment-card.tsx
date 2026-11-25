@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -33,7 +34,11 @@ export function ApartmentCard({ summary }: { summary: ApartmentSummary }) {
   const { apartment } = summary;
 
   return (
-    <Card>
+    <Link
+      href={`/apartment/${apartment.codigo}`}
+      className="group block w-full rounded-xl border border-transparent transition-transform duration-200 hover:scale-105 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+    >
+      <Card className="h-full">
       <CardHeader>
         <CardTitle>{apartment.nombre}</CardTitle>
         <CardDescription>{summary.totalCuotas} cuotas en total</CardDescription>
@@ -76,5 +81,6 @@ export function ApartmentCard({ summary }: { summary: ApartmentSummary }) {
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 }

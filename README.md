@@ -20,19 +20,19 @@ Credenciales y `SESSION_SECRET` solo en `.env.local` (nunca en git).
 
 ## Operación (app pública)
 
-### Arranque automático
-Al iniciar sesión en Windows, la tarea programada **`ElementalApp-Publica`**
-(`Win + R` → `taskschd.msc`) ejecuta `scripts/start-public.ps1`, que:
+### Arranque manual (autostart retirado)
 
-1. libera el puerto 3000 (procesos `node` huérfanos),
-2. espera a que Tailscale esté en estado `Running` (≤90 s); si no llega,
-   abre su GUI (`tailscale-ipn.exe`) para destrabarlo y vuelve a esperar (≤60 s),
-3. lanza `tailscale funnel 3000` si no está corriendo y programa un **sondeo**
-   que escribe `PASS`/`FAIL` en el log (primero `localhost:3000`, luego la URL pública),
-4. arranca `pnpm start` (producción).
+Ejecuta PowerShell desde la raíz del proyecto. No hay que hacer cambios ni arreglar scripts.
 
-No hay que hacer nada: ~1 min tras iniciar sesión la URL está viva.
-Para comprobarlo, busca `PASS`/`FAIL` en `%TEMP%\elemental-start.log`.
+1. **Tailscale en estado `Running`:** `& "C:\Program Files\Tailscale\tailscale.exe" status`. (Si está atorado, abre `tailscale-ipn.exe` — ver "Errores a evitar" en `MEMORY.md`.)
+2. **Funnel:** `& "C:\Program Files\Tailscale\tailscale.exe" funnel 3000` — esto abre el túnel y genera la URL estable. Verifica con `tailscale funnel status` → `https://desktop-vt0tpeg.tail3c231e.ts.net`.
+3. **App:** `pnpm start` (en `C:\cursos-ia\elementalIANextjs\elemental-app-ia`). Tarda ~20 s; comprobación:
+   - `http://localhost:3000` → HTTP 200 (el dashboard "Control de cuota inicial")
+   - `https://desktop-vt0tpeg.tail3c231e.ts.net` → HTTP 200 (misma app por el túnel)
+
+Para detener la app: matar puerto 3000 + proceso `tailscale.exe funnel`.
+
+Para el túnel por separado: `& "C:\Program Files\Tailscale\tailscale.exe" funnel stop`.
 
 ### Publicar a mano (sin tarea)
 ```powershell

@@ -15,6 +15,10 @@ export type Apartment = {
   valorTotal: number;
   /** Valor de la cuota inicial que se debe completar. */
   cuotaInicial: number;
+  /** Número del apartamento en la ubicación (columna BD `apartamento.numeroInmueble`); sin valor si el negocio no lo registra. */
+  numeroInmueble?: number;
+  /** Vínculo de consignación guardado en la BD (columna `apartamento.link_consignacion`). */
+  linkConsignacion?: string;
 };
 
 /** Usuario que realiza pagos. */

@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { verifyPin } from "@/lib/auth";
-import { getUserById, getUserPinHash } from "@/data/db";
+import { getApartments, getUserById, getUserPinHash } from "@/data/db";
 import { createSession, destroySession } from "@/lib/session";
 import { clearFailures, registerFailure, remainingLockMs } from "@/lib/rate-limit";
 
@@ -47,6 +47,31 @@ export async function login(
 
   clearFailures(userId);
   await createSession(user.id);
+
+  // CA-1.3: llevar al apartamento pedido, si es válida y existe en la BD
+  // (constitución 5: sin open redirect — la regex contiene la dirección).
+  const next = formData.get("next");
+  const sanitizedNext =
+    typeof next === "string" && /^\/apartment\/[^/]+$/.test(next)
+      ? next
+      : null;
+
+  // redirect() lanza NEXT_REDIRECT y siempre termina (redirige): no debe
+  // quedar dentro de try que lo "atrape" de arriba.
+  if (sanitizedNext) {
+    let matchesNextApartment = false;
+    try {
+      const apartments = await getApartments();
+      const codigo = sanitizedNext.split("/").pop()!;
+      matchesNextApartment = apartments.some(
+        (apartment) => apartment.codigo === codigo
+      );
+    } catch {
+      // BD no responde al verificar next → dashboard.
+    }
+    if (matchesNextApartment) redirect(sanitizedNext);
+  }
+
   redirect("/");
 }
 

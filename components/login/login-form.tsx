@@ -9,11 +9,19 @@ import type { User } from "@/lib/types";
 const INITIAL_STATE: LoginState = {};
 
 /** Formulario de login (cliente): elige usuario e ingresa el PIN. */
-export function LoginForm({ users }: { users: User[] }) {
+export function LoginForm({
+  users,
+  next,
+}: {
+  users: User[];
+  /** Dirección válida "/apartment/<código>" → hidden input del formulario. */
+  next?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(login, INITIAL_STATE);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
+      {next && <input type="hidden" name="next" value={next} />}
       <div className="flex flex-col gap-1.5">
         <label htmlFor="userId" className="text-sm font-medium">
           Usuario

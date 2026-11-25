@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { ApartmentCard } from "@/components/dashboard/apartment-card";
 import { Header } from "@/components/dashboard/header";
-import { InstallmentsSection } from "@/components/dashboard/installments-section";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { SummaryHero } from "@/components/dashboard/summary-hero";
 import { UsersSummary } from "@/components/dashboard/users-summary";
@@ -28,6 +27,14 @@ export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6">
       <Header />
+        <div className="flex flex-col gap-1.5">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          Proyecto Elemental
+        </h1>
+        <p className="text-muted-foreground">
+          Estado de los pagos de los apartamentos 
+        </p>
+      </div>
 
       <Suspense fallback={<DashboardLoading />}>
         <DashboardContent />
@@ -99,13 +106,6 @@ async function DashboardContent() {
         <h2 className="text-lg font-semibold tracking-tight">Usuarios</h2>
         <UsersSummary summaries={userSummaries} apartments={apartments} />
       </section>
-
-      {/* ---------- Cuotas ---------- */}
-      <InstallmentsSection
-        installments={installments}
-        apartments={apartments}
-        users={users}
-      />
     </>
   );
 }

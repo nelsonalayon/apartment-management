@@ -19,7 +19,16 @@ import type { User } from "@/lib/types";
  * build, así que la parte dinámica (sesión + usuarios) va detrás del
  * límite y el shell (título) se sirve al instante.
  */
-export default function LoginPage() {
+export default function LoginPage({
+  searchParams,
+}: PageProps<"/login">) {
+  const next = searchParams.then(async (params) => {
+    const value = params.next;
+    return typeof value === "string" && /^\/apartment\/[^/]+$/.test(value)
+      ? value
+      : null;
+  });
+
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 py-10">
       <div className="flex flex-col items-center gap-2 text-center">
@@ -48,18 +57,19 @@ export default function LoginPage() {
           </Card>
         }
       >
-        <LoginPanel />
+        <LoginPanel next={next} />
       </Suspense>
     </main>
   );
 }
 
 /** Parte dinámica: sesión actual + lista de usuarios desde la BD. */
-async function LoginPanel() {
+async function LoginPanel({ next }: { next: Promise<string | null> }) {
   const sessionUser = await getCurrentUser();
   if (sessionUser) redirect("/");
 
   const users: User[] = await getUsers();
+  const nextValue = await next;
 
   return (
     <Card className="w-full max-w-sm">
@@ -68,7 +78,7 @@ async function LoginPanel() {
         <CardDescription>Selecciona tu nombre e ingresa tu PIN</CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm users={users} />
+        <LoginForm users={users} next={nextValue} />
       </CardContent>
     </Card>
   );
